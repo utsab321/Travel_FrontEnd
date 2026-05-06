@@ -49,9 +49,9 @@ const PALETTES = {
     goldDark: "#f45100",
     bgDark: "#f4f0e8",
     bgDarker: "#f4f0e8",
-    white: "#ffffff",
+    white: "#15120d",
     textGold: "#ff6a00",
-    textMuted: "rgba(21, 18, 13, 0.80)",
+    textMuted: "#15120d",
     textDim: "rgba(21, 18, 13, 0.70)",
     red400: "#dc2626",
   }
@@ -120,10 +120,12 @@ function useThemeColors() {
 }
 
 function SimilarityBadge({ score }) {
+  const C = useThemeColors();
+  
   if (!score && score !== 0) return null;
   
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border bg-[#C9A84C]/15 border-[#C9A84C]/40 text-[#C9A84C]">
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border" style={{ backgroundColor: `${C.textGold}15`, border: `1px solid ${C.textGold}40`, color: C.textGold }}>
       <Zap className="w-4 h-4" />
       <span className="font-semibold" style={{ fontFamily: FONTS.body }}>{score}% Match</span>
     </div>
@@ -475,7 +477,7 @@ export default function UserProfile() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0a0c16] to-[#0f1219] flex items-center justify-center">
         <div className="flex flex-col items-center gap-6 text-center max-w-sm">
-          <AlertCircle className="w-12 h-12 text-[#C9A84C]" />
+          <AlertCircle className="w-12 h-12" style={{ color: C.textGold }} />
           
           {isPrivateProfileError && userData ? (
             <>
@@ -497,23 +499,23 @@ export default function UserProfile() {
               </div>
               
               <div>
-                <h2 className="text-2xl font-bold text-white" style={{ fontFamily: FONTS.display }}>
+                <h2 className="text-2xl font-bold" style={{ fontFamily: FONTS.display, color: C.white }}>
                   {userData.first_name && userData.last_name
                     ? `${userData.first_name} ${userData.last_name}`
                     : userData.username}
                 </h2>
-                <p className="text-[#C9A84C] text-sm">@{userData.username}</p>
+                <p className="text-sm" style={{ color: C.textGold }}>@{userData.username}</p>
               </div>
               
-              <p className="text-white/70">{error}</p>
+              <p style={{ color: C.textMuted }}>{error}</p>
               
               {/* Show friend request button */}
               {!isOwnProfile && friendStatus?.status !== "accepted" && (
                 <button
                   onClick={sendFriendRequest}
                   disabled={actionLoading}
-                  className="mt-4 flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white transition bg-gradient-to-r from-[#C9A84C] to-[#d4b76a] hover:from-[#d4b76a] hover:to-[#e0c383] disabled:opacity-50"
-                  style={{ fontFamily: FONTS.body }}
+                  className="mt-4 flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white transition bg-gradient-to-r hover:from-[#d4b76a] hover:to-[#e0c383] disabled:opacity-50"
+                  style={{ fontFamily: FONTS.body, backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})` }}
                 >
                   {actionLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -526,7 +528,8 @@ export default function UserProfile() {
               
               <button
                 onClick={() => navigate(-1)}
-                className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition flex items-center gap-2 mx-auto"
+                className="mt-4 px-4 py-2 rounded-lg transition flex items-center gap-2 mx-auto"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: C.white }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 {MESSAGES.goBack}
@@ -534,10 +537,11 @@ export default function UserProfile() {
             </>
           ) : (
             <>
-              <p className="text-white/80">{error}</p>
+              <p style={{ color: C.textMuted }}>{error}</p>
               <button
                 onClick={() => navigate(-1)}
-                className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition flex items-center gap-2"
+                className="mt-4 px-4 py-2 rounded-lg transition flex items-center gap-2"
+                style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: C.white }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 {MESSAGES.goBack}
@@ -599,8 +603,8 @@ export default function UserProfile() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <h1
-                      className="text-4xl font-bold text-white mb-2"
-                      style={{ fontFamily: FONTS.display }}
+                      className="text-4xl font-bold mb-2"
+                      style={{ fontFamily: FONTS.display, color: C.white }}
                     >
                       {userData.first_name && userData.last_name
                         ? `${userData.first_name} ${userData.last_name}`
@@ -613,16 +617,16 @@ export default function UserProfile() {
               </div>
 
               {userData.location && (
-                <div className="flex items-center gap-2 text-white/70 mb-3">
-                  <MapPin className="w-5 h-5 text-[#C9A84C]" />
+                <div className="flex items-center gap-2 mb-3" style={{ color: C.textDim }}>
+                  <MapPin className="w-5 h-5" style={{ color: C.textGold }} />
                   <span style={{ fontFamily: FONTS.body }}>{userData.location}</span>
                 </div>
               )}
 
               {userData.bio && (
                 <p
-                  className="text-white/80 mb-6 leading-relaxed"
-                  style={{ fontFamily: FONTS.body }}
+                  className="mb-6 leading-relaxed"
+                  style={{ fontFamily: FONTS.body, color: C.textMuted }}
                 >
                   {userData.bio}
                 </p>
@@ -632,7 +636,7 @@ export default function UserProfile() {
               {!isOwnProfile && (
                 <>
                   {userKycStatus && userKycStatus !== 'approved' && (
-                    <div className="mb-4 p-3 rounded-lg bg-[#C9A84C]/15 border border-[#C9A84C]/40 text-[#C9A84C] text-sm flex items-center gap-2">
+                    <div className="mb-4 p-3 rounded-lg text-sm flex items-center gap-2" style={{ backgroundColor: `${C.textGold}15`, border: `1px solid ${C.textGold}40`, color: C.textGold }}>
                       <AlertCircle className="w-4 h-4 flex-shrink-0" />
                       <span style={{ fontFamily: FONTS.body }}>{MESSAGES.completKyc}</span>
                     </div>
@@ -650,8 +654,8 @@ export default function UserProfile() {
                       <button
                         onClick={handleStartChat}
                         disabled={actionLoading || (userKycStatus && userKycStatus !== 'approved')}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white transition bg-gradient-to-r from-[#C9A84C] to-[#d4b76a] hover:from-[#d4b76a] hover:to-[#e0c383] disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: FONTS.body }}
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ fontFamily: FONTS.body, backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})` }}
                         title={userKycStatus && userKycStatus !== 'approved' ? MESSAGES.kycChatTooltip : ''}
                       >
                         <MessageCircle className="w-4 h-4" />
@@ -676,8 +680,8 @@ export default function UserProfile() {
                     <button
                       onClick={cancelFriendRequest}
                       disabled={actionLoading}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold bg-[#C9A84C]/20 border border-[#C9A84C] text-[#C9A84C] hover:bg-[#C9A84C]/30 transition disabled:opacity-50"
-                      style={{ fontFamily: FONTS.body }}
+                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold border transition disabled:opacity-50"
+                      style={{ fontFamily: FONTS.body, backgroundColor: `${C.textGold}20`, border: `1px solid ${C.textGold}`, color: C.textGold }}
                     >
                       {actionLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -715,8 +719,8 @@ export default function UserProfile() {
                     <button
                       onClick={sendFriendRequest}
                       disabled={actionLoading || (userKycStatus && userKycStatus !== 'approved')}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-[#0a0c16] transition bg-gradient-to-r from-[#C9A84C] to-[#d4b76a] hover:from-[#d4b76a] hover:to-[#e0c383] disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ fontFamily: FONTS.body }}
+                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: FONTS.body, backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})`, color: '#0a0c16' }}
                       title={userKycStatus && userKycStatus !== 'approved' ? MESSAGES.kycFriendTooltip : ''}
                     >
                       {actionLoading ? (
@@ -733,7 +737,7 @@ export default function UserProfile() {
 
               {/* Cooldown Message */}
               {cooldownMessage && (
-                <div className="mt-3 p-3 rounded-lg bg-red-500/15 border border-red-500/40 text-red-400 text-sm flex items-center gap-2">
+                <div className="mt-3 p-3 rounded-lg text-sm flex items-center gap-2" style={{ backgroundColor: 'rgba(220, 38, 38, 0.15)', border: '1px solid rgba(220, 38, 38, 0.4)', color: '#dc2626' }}>
                   <Clock className="w-4 h-4 flex-shrink-0" />
                   <span style={{ fontFamily: FONTS.body }}>{cooldownMessage}</span>
                 </div>
@@ -744,7 +748,7 @@ export default function UserProfile() {
                 <PhotoGallerySkeleton />
               ) : userPhotos.length > 0 ? (
                 <div className="rounded-2xl bg-white/3 border border-white/8 overflow-hidden mb-12">
-                  <p style={{ fontFamily: FONTS.body }} className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/30 px-6 pt-4 pb-3 flex items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] px-6 pt-4 pb-3 flex items-center gap-2" style={{ fontFamily: FONTS.body, color: C.textDim }}>
                     <Image className="w-4 h-4" />
                     Trip Photos
                   </p>
@@ -770,11 +774,11 @@ export default function UserProfile() {
                           {group.trip && (
                             <Link
                               to={`/trip/${group.trip.id}`}
-                              style={{ fontFamily: FONTS.body }}
-                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#C9A84C]/10 border border-[#C9A84C]/30 hover:bg-[#C9A84C]/20 transition"
+                              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition"
+                              style={{ fontFamily: FONTS.body, backgroundColor: `${C.textGold}10`, border: `1px solid ${C.textGold}30`, color: C.textGold }}
                             >
-                              <MapPin className="w-4 h-4 text-[#C9A84C]" />
-                              <span className="font-semibold text-[#C9A84C] text-sm">
+                              <MapPin className="w-4 h-4" style={{ color: C.textGold }} />
+                              <span className="font-semibold text-sm" style={{ color: C.textGold }}>
                                 {group.trip.destination?.name || "Trip"} ({group.photos.length} photo{group.photos.length !== 1 ? 's' : ''})
                               </span>
                             </Link>
@@ -806,8 +810,8 @@ export default function UserProfile() {
                                 {photo.caption && (
                                   <div className="p-2 hidden group-hover:block">
                                     <p 
-                                      style={{ fontFamily: FONTS.body }} 
-                                      className="text-xs text-white/80"
+                                      style={{ fontFamily: FONTS.body, color: C.textMuted }} 
+                                      className="text-xs"
                                     >
                                       {photo.caption}
                                     </p>
@@ -836,8 +840,8 @@ export default function UserProfile() {
                 userData.accomodation_preference) && (
                 <div className="mb-12">
                   <h2
-                    className="text-2xl font-bold text-white mb-6"
-                    style={{ fontFamily: FONTS.display }}
+                    className="text-2xl font-bold mb-6"
+                    style={{ fontFamily: FONTS.display, color: C.white }}
                   >
                     {MESSAGES.travelPreferences}
                   </h2>
@@ -847,15 +851,15 @@ export default function UserProfile() {
                         <div className="flex items-center gap-3 mb-3">
                           <StyleIcon style={userData.travel_style.toLowerCase()} />
                           <h3
-                            className="text-sm font-semibold text-[#C9A84C]"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-sm font-semibold"
+                            style={{ fontFamily: FONTS.body, color: C.textGold }}
                           >
                             {MESSAGES.travelStyle}
                           </h3>
                         </div>
                         <p
-                          className="text-lg text-white capitalize"
-                          style={{ fontFamily: FONTS.body }}
+                          className="text-lg"
+                          style={{ fontFamily: FONTS.body, color: C.white }}
                         >
                           {userData.travel_style}
                         </p>
@@ -866,15 +870,15 @@ export default function UserProfile() {
                         <div className="flex items-center gap-3 mb-3">
                           <PaceIcon pace={userData.pace.toLowerCase()} />
                           <h3
-                            className="text-sm font-semibold text-[#C9A84C]"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-sm font-semibold"
+                            style={{ fontFamily: FONTS.body, color: C.textGold }}
                           >
                             {MESSAGES.pace}
                           </h3>
                         </div>
                         <p
-                          className="text-lg text-white capitalize"
-                          style={{ fontFamily: FONTS.body }}
+                          className="text-lg capitalize"
+                          style={{ fontFamily: FONTS.body, color: C.white }}
                         >
                           {userData.pace.replace("_", " ")}
                         </p>
@@ -883,17 +887,17 @@ export default function UserProfile() {
                     {userData.preferred_destinations && (
                       <div className="bg-white/5 border border-[#C9A84C]/20 rounded-2xl p-6 hover:bg-white/8 transition">
                         <div className="flex items-center gap-3 mb-3">
-                          <Globe className="w-5 h-5 text-[#C9A84C]" />
+                          <Globe className="w-5 h-5" style={{ color: C.textGold }} />
                           <h3
-                            className="text-sm font-semibold text-[#C9A84C]"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-sm font-semibold"
+                            style={{ fontFamily: FONTS.body, color: C.textGold }}
                           >
                             {MESSAGES.destinations}
                           </h3>
                         </div>
                         <p
-                          className="text-lg text-white"
-                          style={{ fontFamily: FONTS.body }}
+                          className="text-lg"
+                          style={{ fontFamily: FONTS.body, color: C.white }}
                         >
                           {userData.preferred_destinations}
                         </p>
@@ -906,15 +910,15 @@ export default function UserProfile() {
                             accommodation={userData.accomodation_preference.toLowerCase()}
                           />
                           <h3
-                            className="text-sm font-semibold text-[#C9A84C]"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-sm font-semibold"
+                            style={{ fontFamily: FONTS.body, color: C.textGold }}
                           >
                             {MESSAGES.accommodation}
                           </h3>
                         </div>
                         <p
-                          className="text-lg text-white capitalize"
-                          style={{ fontFamily: FONTS.body }}
+                          className="text-lg capitalize"
+                          style={{ fontFamily: FONTS.body, color: C.white }}
                         >
                           {userData.accomodation_preference}
                         </p>
@@ -930,8 +934,8 @@ export default function UserProfile() {
                 userData.social_level) && (
                 <div>
                   <h2
-                    className="text-2xl font-bold text-white mb-6"
-                    style={{ fontFamily: FONTS.display }}
+                    className="text-2xl font-bold mb-6"
+                    style={{ fontFamily: FONTS.display, color: C.white }}
                   >
                     {MESSAGES.vibes}
                   </h2>
@@ -940,26 +944,27 @@ export default function UserProfile() {
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <Wallet className="w-5 h-5 text-[#C9A84C]" />
+                            <Wallet className="w-5 h-5" style={{ color: C.textGold }} />
                             <span
-                              className="font-semibold text-white"
-                              style={{ fontFamily: FONTS.body }}
+                              className="font-semibold"
+                              style={{ fontFamily: FONTS.body, color: C.white }}
                             >
                               {MESSAGES.budget}
                             </span>
                           </div>
                           <span
-                            className="text-[#C9A84C] font-semibold"
-                            style={{ fontFamily: FONTS.mono }}
+                            className="font-semibold"
+                            style={{ fontFamily: FONTS.mono, color: C.textGold }}
                           >
                             {userData.budget_level}
                           </span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-[#C9A84C] to-[#d4b76a]"
+                            className="h-full"
                             style={{
                               width: `${(userData.budget_level / 10) * 100}%`,
+                              backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})`
                             }}
                           />
                         </div>
@@ -969,26 +974,27 @@ export default function UserProfile() {
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <Zap className="w-5 h-5 text-[#C9A84C]" />
+                            <Zap className="w-5 h-5" style={{ color: C.textGold }} />
                             <span
-                              className="font-semibold text-white"
-                              style={{ fontFamily: FONTS.body }}
+                              className="font-semibold"
+                              style={{ fontFamily: FONTS.body, color: C.white }}
                             >
                               {MESSAGES.adventure}
                             </span>
                           </div>
                           <span
-                            className="text-[#C9A84C] font-semibold"
-                            style={{ fontFamily: FONTS.mono }}
+                            className="font-semibold"
+                            style={{ fontFamily: FONTS.mono, color: C.textGold }}
                           >
                             {userData.adventure_level}
                           </span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-[#C9A84C] to-[#d4b76a]"
+                            className="h-full"
                             style={{
                               width: `${(userData.adventure_level / 10) * 100}%`,
+                              backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})`
                             }}
                           />
                         </div>
@@ -998,26 +1004,27 @@ export default function UserProfile() {
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <Users className="w-5 h-5 text-[#C9A84C]" />
+                            <Users className="w-5 h-5" style={{ color: C.textGold }} />
                             <span
-                              className="font-semibold text-white"
-                              style={{ fontFamily: FONTS.body }}
+                              className="font-semibold"
+                              style={{ fontFamily: FONTS.body, color: C.white }}
                             >
                               {MESSAGES.social}
                             </span>
                           </div>
                           <span
-                            className="text-[#C9A84C] font-semibold"
-                            style={{ fontFamily: FONTS.mono }}
+                            className="font-semibold"
+                            style={{ fontFamily: FONTS.mono, color: C.textGold }}
                           >
                             {userData.social_level}
                           </span>
                         </div>
                         <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-[#C9A84C] to-[#d4b76a]"
+                            className="h-full"
                             style={{
                               width: `${(userData.social_level / 10) * 100}%`,
+                              backgroundImage: `linear-gradient(to right, ${C.textGold}, ${C.goldLight})`
                             }}
                           />
                         </div>
@@ -1033,10 +1040,10 @@ export default function UserProfile() {
               <div className="w-80">
                 <div className="sticky top-24 bg-white/5 border border-[#C9A84C]/20 rounded-2xl p-6">
                   <h3
-                    className="text-lg font-semibold text-white mb-4 flex items-center gap-2"
-                    style={{ fontFamily: FONTS.display }}
+                    className="text-lg font-semibold mb-4 flex items-center gap-2"
+                    style={{ fontFamily: FONTS.display, color: C.white }}
                   >
-                    <Users className="w-5 h-5 text-[#C9A84C]" />
+                    <Users className="w-5 h-5" style={{ color: C.textGold }} />
                     Friends
                   </h3>
                   <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -1048,16 +1055,16 @@ export default function UserProfile() {
                           className="block p-3 rounded-lg bg-white/5 border border-white/10 hover:border-[#C9A84C]/40 hover:bg-white/8 transition group"
                         >
                           <p
-                            className="text-sm font-semibold text-white group-hover:text-[#C9A84C] transition"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-sm font-semibold transition"
+                            style={{ fontFamily: FONTS.body, color: C.white }}
                           >
                             {friend.first_name && friend.last_name
                               ? `${friend.first_name} ${friend.last_name}`
                               : friend.username}
                           </p>
                           <p
-                            className="text-xs text-white/50 group-hover:text-white/70 transition"
-                            style={{ fontFamily: FONTS.body }}
+                            className="text-xs transition"
+                            style={{ fontFamily: FONTS.body, color: C.textMuted }}
                           >
                             @{friend.username}
                           </p>
@@ -1065,8 +1072,8 @@ export default function UserProfile() {
                       ))
                     ) : (
                       <p
-                        className="text-center text-white/50 py-6"
-                        style={{ fontFamily: FONTS.body }}
+                        className="text-center py-6"
+                        style={{ fontFamily: FONTS.body, color: C.textMuted }}
                       >
                         No friends yet
                       </p>
@@ -1083,14 +1090,14 @@ export default function UserProfile() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-[#0f1219] border border-[#C9A84C]/20 rounded-2xl p-8 max-w-md mx-4">
               <h3
-                className="text-xl font-bold text-white mb-4"
-                style={{ fontFamily: FONTS.display }}
+                className="text-xl font-bold mb-4"
+                style={{ fontFamily: FONTS.display, color: C.white }}
               >
                 Remove Friend?
               </h3>
               <p
-                className="text-white/80 mb-6"
-                style={{ fontFamily: FONTS.body }}
+                className="mb-6"
+                style={{ fontFamily: FONTS.body, color: C.textMuted }}
               >
                 Are you sure you want to unfriend {userData.first_name || userData.username}? You can always add them back later.
               </p>
@@ -1132,6 +1139,27 @@ export default function UserProfile() {
           --text: #15120d;
           --text-secondary: #5d5550;
           --border: rgba(21, 18, 13, 0.10);
+        }
+
+        /* Ensure text remains visible in light mode */
+        [data-theme="light"] .text-white {
+          color: #15120d !important;
+        }
+
+        [data-theme="light"] .text-white\/80 {
+          color: rgba(21, 18, 13, 0.8) !important;
+        }
+
+        [data-theme="light"] .text-white\/70 {
+          color: rgba(21, 18, 13, 0.7) !important;
+        }
+
+        [data-theme="light"] .text-white\/50 {
+          color: rgba(21, 18, 13, 0.5) !important;
+        }
+
+        [data-theme="light"] .text-white\/30 {
+          color: rgba(21, 18, 13, 0.3) !important;
         }
 
         [data-theme="light"] .min-h-screen {
