@@ -11,62 +11,28 @@ import TripInviteModal from "../components/TripInviteModal";
 import TripPhotos from "../components/TripPhotos";
 
 // ─── Palette ────────────────────────────────────────────────────────────────
-const PALETTES = {
-  dark: {
-    bg:         "#07080f",
-    surface:    "#0d0f1c",
-    card:       "#0f1220",
-    border:     "#1a1d2e",
-    borderHi:   "#252840",
-    gold:       "#c8b882",
-    goldDim:    "#8a7040",
-    goldBg:     "rgba(200,184,130,0.08)",
-    goldRing:   "rgba(200,184,130,0.25)",
-    text:       "#f0ece0",
-    textSub:    "#8a8890",
-    textMuted:  "#4a4a60",
-    red:        "#c05050",
-    redBg:      "rgba(192,80,80,0.1)",
-    green:      "#50a878",
-    greenBg:    "rgba(80,168,120,0.1)",
-    blue:       "#5588cc",
-    blueBg:     "rgba(85,136,204,0.1)",
-  },
-  light: {
-    bg:         "#f4f0e8",
-    surface:    "#ffffff",
-    card:       "#ffffff",
-    border:     "rgba(21, 18, 13, 0.10)",
-    borderHi:   "rgba(21, 18, 13, 0.15)",
-    gold:       "#ff6a00",
-    goldDim:    "#f45100",
-    goldBg:     "rgba(255, 106, 0, 0.10)",
-    goldRing:   "rgba(255, 106, 0, 0.28)",
-    text:       "#15120d",
-    textSub:    "#6b5d52",
-    textMuted:  "rgba(21, 18, 13, 0.50)",
-    red:        "#dc2626",
-    redBg:      "rgba(220, 38, 38, 0.10)",
-    green:      "#16a34a",
-    greenBg:    "rgba(22, 163, 74, 0.10)",
-    blue:       "#2563eb",
-    blueBg:     "rgba(37, 99, 235, 0.10)",
-  }
+const C = {
+  bg:         "#07080f",
+  surface:    "#0d0f1c",
+  card:       "#0f1220",
+  border:     "#1a1d2e",
+  borderHi:   "#252840",
+  gold:       "#c8b882",
+  goldDim:    "#8a7040",
+  goldBg:     "rgba(200,184,130,0.08)",
+  goldRing:   "rgba(200,184,130,0.25)",
+  text:       "#f0ece0",
+  textSub:    "#8a8890",
+  textMuted:  "#4a4a60",
+  red:        "#c05050",
+  redBg:      "rgba(192,80,80,0.1)",
+  green:      "#50a878",
+  greenBg:    "rgba(80,168,120,0.1)",
+  blue:       "#5588cc",
+  blueBg:     "rgba(85,136,204,0.1)",
 };
 
-const getTheme = () => {
-  if (typeof document !== 'undefined') {
-    const theme = document.documentElement.getAttribute('data-theme');
-    return theme === 'light' ? 'light' : 'dark';
-  }
-  return 'dark';
-};
-
-const C = PALETTES[getTheme()];
-
-const CHART_COLORS = getTheme() === 'light' 
-  ? ["#ff6a00","#2563eb","#16a34a","#dc2626","#9333ea","#ea580c","#0891b2","#db2777"]
-  : ["#c8b882","#5588cc","#50a878","#c05050","#9b88cc","#cc8855","#55a8cc","#cc5588"];
+const CHART_COLORS = ["#c8b882","#5588cc","#50a878","#c05050","#9b88cc","#cc8855","#55a8cc","#cc5588"];
 
 const TEXTS = {
   loadingTrip: "Loading trip…",
@@ -99,19 +65,16 @@ const fmt = (d) => new Date(d).toLocaleDateString("en-US", { month: "short", day
 const fmtTime = (d) => new Date(d).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 function Avatar({ name = "?", size = 36, style = {}, src = null }) {
-  const theme = getTheme();
-  const C = PALETTES[theme];
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   const baseUrl = (process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/").replace('/api/', '');
   const imageUrl = src && (src.startsWith("http") ? src : `${baseUrl}${src}`);
-  const textColor = theme === 'light' ? '#15120d' : '#0d0f1c';
   
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
       background: `linear-gradient(135deg, ${C.gold}, ${C.goldDim})`,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.36, fontWeight: 600, color: textColor,
+      fontSize: size * 0.36, fontWeight: 600, color: "#0d0f1c",
       letterSpacing: "-0.5px", overflow: "hidden", ...style
     }}>
       {imageUrl ? <img src={imageUrl} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
@@ -119,7 +82,7 @@ function Avatar({ name = "?", size = 36, style = {}, src = null }) {
   );
 }
 
-function Badge({ children, color, bg }) {
+function Badge({ children, color = C.gold, bg }) {
   return (
     <span style={{
       padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 500,
@@ -130,7 +93,6 @@ function Badge({ children, color, bg }) {
 }
 
 function SectionTitle({ children }) {
-  const C = PALETTES[getTheme()];
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
       <span style={{ width: 3, height: 18, borderRadius: 2, background: C.gold, flexShrink: 0 }} />
@@ -139,32 +101,10 @@ function SectionTitle({ children }) {
   );
 }
 
-function useThemeColors() {
-  const [theme, setTheme] = useState(getTheme());
-  const [C, setC] = useState(PALETTES[theme]);
-
-  useEffect(() => {
-    const handleThemeChange = () => {
-      const newTheme = getTheme();
-      setTheme(newTheme);
-      setC(PALETTES[newTheme]);
-    };
-
-    // Check for theme changes on mount and when document changes
-    const observer = new MutationObserver(handleThemeChange);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return C;
-}
-
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function TripDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const C = useThemeColors();
 
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -173,12 +113,7 @@ export default function TripDetail() {
   const [userProfileId, setUserProfileId] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [itineraryOpen, setItineraryOpen] = useState(true);
-
-  // Join/Leave
-  const [joiningTrip, setJoiningTrip] = useState(false);
-  const [leavingTrip, setLeavingTrip] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("success"); // "success" or "error"
+  const [tripActionLoading, setTripActionLoading] = useState(false);
 
   // Chat
   const [messages, setMessages] = useState([]);
@@ -309,53 +244,30 @@ export default function TripDetail() {
     }
   };
 
-  const showToast = (message, type = "success") => {
-    setToastMessage(message);
-    setToastType(type);
-    setTimeout(() => setToastMessage(""), 3000);
-  };
-
   const handleJoinTrip = async () => {
-    setJoiningTrip(true);
+    setTripActionLoading(true);
     try {
       const response = await API.post(`trips/${id}/join/`);
-      if (response.status === 200) {
-        // Update trip data with new participants
-        setTrip(response.data.trip || response.data);
-        showToast("Successfully joined the trip!");
-        // Auto-scroll to chat
-        setTimeout(() => {
-          const chatContainer = document.querySelector('.td-scrollbar');
-          if (chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-          }
-        }, 100);
-      }
+      setTrip(response.data.trip || response.data);
+      alert(response.data.message || "Joined trip successfully");
     } catch (err) {
-      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to join trip";
-      showToast(errorMessage, "error");
+      alert(err.response?.data?.error || err.response?.data?.message || "Failed to join trip");
     } finally {
-      setJoiningTrip(false);
+      setTripActionLoading(false);
     }
   };
 
   const handleLeaveTrip = async () => {
-    if (!window.confirm("Are you sure you want to leave this trip?")) return;
-    setLeavingTrip(true);
+    if (!window.confirm("Leave this trip?")) return;
+    setTripActionLoading(true);
     try {
       const response = await API.post(`trips/${id}/leave/`);
-      if (response.status === 200) {
-        // Update trip data without current user
-        setTrip(response.data.trip || response.data);
-        showToast("You have left the trip");
-        // Navigate back to dashboard after a short delay
-        setTimeout(() => navigate("/dashboard"), 1500);
-      }
+      setTrip(response.data.trip || response.data);
+      alert(response.data.message || "Left trip successfully");
     } catch (err) {
-      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to leave trip";
-      showToast(errorMessage, "error");
+      alert(err.response?.data?.error || err.response?.data?.message || "Failed to leave trip");
     } finally {
-      setLeavingTrip(false);
+      setTripActionLoading(false);
     }
   };
 
@@ -529,8 +441,6 @@ export default function TripDetail() {
         .td-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .td-scrollbar::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 4px; }
         .td-scrollbar::-webkit-scrollbar-thumb:hover { background: ${C.borderHi}; }
-        .td-participant { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .td-participant:hover { border-color: ${C.goldRing} !important; background: ${C.goldBg} !important; }
         .td-day-item:hover { border-color: ${C.goldRing} !important; }
         .td-msg-bubble { transition: background 0.1s; }
@@ -540,10 +450,6 @@ export default function TripDetail() {
         .td-tag:hover { border-color: ${C.gold} !important; }
         .td-star-btn:hover { color: ${C.gold} !important; }
         textarea { resize: none; }
-        @keyframes slideInUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
 
       {/* ── TOP NAV BAR ── */}
@@ -562,24 +468,6 @@ export default function TripDetail() {
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: C.goldBg, border: `1px solid ${C.goldRing}`, borderRadius: 9, color: C.gold, fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}
             >
               <Share2 size={13} /> Invite
-            </button>
-          )}
-          {!isCreator && !isParticipant && (
-            <button
-              onClick={handleJoinTrip}
-              disabled={joiningTrip}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: C.goldBg, border: `1px solid ${C.goldRing}`, borderRadius: 9, color: C.gold, fontSize: 12, fontWeight: 500, cursor: joiningTrip ? "not-allowed" : "pointer", opacity: joiningTrip ? 0.6 : 1, fontFamily: "inherit" }}
-            >
-              {joiningTrip ? <Loader2 size={13} className="animate-spin" /> : <Users size={13} />} {joiningTrip ? "Joining…" : "Join Trip"}
-            </button>
-          )}
-          {isParticipant && !isCreator && (
-            <button
-              onClick={handleLeaveTrip}
-              disabled={leavingTrip}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", background: C.redBg, border: `1px solid ${C.red}40`, borderRadius: 9, color: C.red, fontSize: 12, fontWeight: 500, cursor: leavingTrip ? "not-allowed" : "pointer", opacity: leavingTrip ? 0.6 : 1, fontFamily: "inherit" }}
-            >
-              {leavingTrip ? <Loader2 size={13} className="animate-spin" /> : <Users size={13} />} {leavingTrip ? "Leaving…" : "Leave Trip"}
             </button>
           )}
           {canDelete && (
@@ -631,6 +519,27 @@ export default function TripDetail() {
                 <Badge color={trip.is_public ? C.green : C.textSub} bg={trip.is_public ? C.greenBg : undefined}>
                   {trip.is_public ? <><Globe size={10} style={{ display: "inline", marginRight: 4 }} />{TEXTS.publicTrip}</> : <><Lock size={10} style={{ display: "inline", marginRight: 4 }} />{TEXTS.privateTrip}</>}
                 </Badge>
+                {!isTripCompleted && !isCreator && (
+                  <button
+                    onClick={isParticipant ? handleLeaveTrip : handleJoinTrip}
+                    disabled={tripActionLoading}
+                    style={{
+                      padding: "6px 12px",
+                      background: isParticipant ? C.redBg : C.goldBg,
+                      border: `1px solid ${isParticipant ? `${C.red}40` : C.goldRing}`,
+                      borderRadius: 9,
+                      color: isParticipant ? C.red : C.gold,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: tripActionLoading ? "not-allowed" : "pointer",
+                      opacity: tripActionLoading ? 0.6 : 1,
+                      fontFamily: "inherit",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {tripActionLoading ? "Please wait..." : isParticipant ? "Leave Trip" : "Join Trip"}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -736,20 +645,10 @@ export default function TripDetail() {
           {/* ── PARTICIPANTS ── */}
           <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: 24, marginBottom: 16 }}>
             <SectionTitle>{TEXTS.participantsTitle} · {trip.participants?.length || 0}</SectionTitle>
-            {!isParticipant && !isCreator && (
-              <p style={{ fontSize: 12, color: C.textMuted, marginBottom: 16, padding: "8px 12px", background: C.surface, borderRadius: 8, borderLeft: `3px solid ${C.gold}` }}>
-                Join this trip to access the group chat and connect with other participants.
-              </p>
-            )}
-            {isParticipant && !isCreator && (
-              <p style={{ fontSize: 12, color: C.green, marginBottom: 16, padding: "8px 12px", background: C.greenBg, borderRadius: 8, borderLeft: `3px solid ${C.green}` }}>
-                ✓ You have joined this trip
-              </p>
-            )}
             {trip.participants?.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
                 {trip.participants.map(p => (
-                  <div key={p.id} className="td-participant" onClick={() => navigate(`/user/${p.id}`)} style={{ display: "flex", gap: 12, padding: "12px 14px", background: C.surface, borderRadius: 12, border: `1px solid ${C.border}`, transition: "border-color 0.15s, background 0.15s", cursor: "pointer" }}>
+                  <div key={p.id} className="td-participant" onClick={() => navigate(`/user/${p.username}`)} style={{ display: "flex", gap: 12, padding: "12px 14px", background: C.surface, borderRadius: 12, border: `1px solid ${C.border}`, transition: "border-color 0.15s, background 0.15s", cursor: "pointer" }}>
                     <Avatar name={`${p.first_name} ${p.last_name}`} size={38} src={p.profile_picture} />
                     <div style={{ minWidth: 0 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -863,15 +762,7 @@ export default function TripDetail() {
 
             {/* Messages */}
             <div ref={chatContainerRef} className="td-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px" }}>
-              {!isParticipant && !isCreator ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 12, paddingTop: 40 }}>
-                  <Lock size={28} color={C.textMuted} />
-                  <div style={{ textAlign: "center" }}>
-                    <p style={{ fontSize: 13, color: C.text, fontWeight: 500, marginBottom: 4 }}>Chat is locked</p>
-                    <p style={{ fontSize: 12, color: C.textMuted, maxWidth: 240 }}>Join this trip to access group chat and connect with other travelers</p>
-                  </div>
-                </div>
-              ) : chatLoading && messages.length === 0 ? (
+              {chatLoading && messages.length === 0 ? (
                 <div style={{ display: "flex", justifyContent: "center", paddingTop: 40 }}>
                   <Loader2 size={18} color={C.textMuted} className="animate-spin" />
                 </div>
@@ -941,8 +832,6 @@ export default function TripDetail() {
             <div style={{ padding: "12px 14px", borderTop: `1px solid ${C.border}` }}>
               {isTripCompleted ? (
                 <p style={{ textAlign: "center", fontSize: 12, color: C.textMuted, padding: "6px 0" }}>This trip has ended. Chat is read-only.</p>
-              ) : !isParticipant && !isCreator ? (
-                <p style={{ textAlign: "center", fontSize: 12, color: C.textMuted, padding: "6px 0" }}>Join the trip to send messages</p>
               ) : (
                 <form onSubmit={handleSendMessage} style={{ display: "flex", alignItems: "center", gap: 8, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: "6px 6px 6px 14px" }}>
                   <input
@@ -965,28 +854,6 @@ export default function TripDetail() {
           </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div style={{
-          position: "fixed", bottom: 20, right: 20, zIndex: 2000,
-          background: toastType === "success" ? C.greenBg : C.redBg,
-          border: `1px solid ${toastType === "success" ? C.green : C.red}`,
-          color: toastType === "success" ? C.green : C.red,
-          padding: "12px 16px", borderRadius: 10, fontSize: 13, fontWeight: 500,
-          display: "flex", alignItems: "center", gap: 8,
-          animation: "slideInUp 0.3s ease-out",
-          fontFamily: "inherit"
-        }}>
-          {toastType === "success" ? "✓" : "✕"} {toastMessage}
-          <style>{`
-            @keyframes slideInUp {
-              from { transform: translateY(100px); opacity: 0; }
-              to { transform: translateY(0); opacity: 1; }
-            }
-          `}</style>
-        </div>
-      )}
 
       {/* Invite Modal */}
       <TripInviteModal

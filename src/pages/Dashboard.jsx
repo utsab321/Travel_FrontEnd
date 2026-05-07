@@ -146,13 +146,15 @@ const styles = `
     border-radius: 14px;
     padding: 5px;
     margin-bottom: 2rem;
+    width: 100%;
+    flex: 1;
   }
   .db-tab {
     flex: 1;
     display: flex; align-items: center; justify-content: center; gap: 7px;
     padding: 10px 16px;
     border-radius: 10px;
-    border: none;
+    border: none !important;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     font-size: 0.82rem;
@@ -161,11 +163,14 @@ const styles = `
     transition: background 0.2s, color 0.2s;
     background: transparent;
     color: rgba(255,255,255,0.4);
+    outline: none !important;
   }
   .db-tab.active {
-    background: linear-gradient(135deg, #f97316, #ea580c);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+    background: transparent !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
   }
   .db-tab:not(.active):hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.7); }
 
@@ -461,7 +466,7 @@ const styles = `
     color: #1a1a2e !important;
   }
   [data-theme="light"] .db-tab.active {
-    color: #fff !important;
+    color: #1a1a2e !important;
   }
 
   [data-theme="light"] .db-stat {
@@ -824,14 +829,16 @@ const styles = `
   [data-theme="light"] .db-tab.active *,
   .db-root[data-theme="light"] .db-tab.active,
   .db-root[data-theme="light"] .db-tab.active * {
-    color: #ffffff !important;
-    stroke: #ffffff !important;
+    color: #1a1a2e !important;
+    stroke: #1a1a2e !important;
   }
 
   [data-theme="light"] .db-tab.active,
   .db-root[data-theme="light"] .db-tab.active {
-    background: linear-gradient(135deg, #fb923c, #ea580c) !important;
-    box-shadow: 0 10px 28px rgba(234, 88, 12, 0.28) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
   }
 
   [data-theme="light"] .trip-meta-item,
@@ -1233,6 +1240,7 @@ export default function Dashboard() {
   const [selectedFilterTags, setSelectedFilterTags] = useState([]);
   const [showTagFilter, setShowTagFilter] = useState(false);
   const [destinationSearch, setDestinationSearch] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const itemsPerPage = 6;
 
   // React Query hooks - will cache data and prevent redundant fetches
@@ -1326,7 +1334,7 @@ export default function Dashboard() {
       console.error("Error processing trips:", err);
       setError("Failed to process trips data");
     }
-  }, [userProfileId, allTrips, recommendedTrips]);
+  }, [userProfileId, allTrips.length, recommendedTrips.length]);
 
   /* ── Enable scrollbar expansion on hover ── */
   useScrollbarExpand(".trips-grid, .scrollbar-expandable");
@@ -1648,18 +1656,91 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Tabs */}
+          {/* Toolbar: Tabs + Refresh Button */}
           {!isLoading && (
-          <div className="db-tabs">
-            {tabs.map(t => (
-              <button
-                key={t.id}
-                className={`db-tab${activeTab === t.id ? " active" : ""}`}
-                onClick={() => setActiveTab(t.id)}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: '0.75rem',
+            marginBottom: '1.5rem',
+            flexWrap: 'wrap',
+            padding: '0',
+            width: '100%'
+          }}>
+            <div className="db-tabs">
+              {tabs.map(t => (
+                <button
+                  key={t.id}
+                  className={`db-tab${activeTab === t.id ? " active" : ""}`}
+                  onClick={() => setActiveTab(t.id)}
+                >
+                  {t.icon} {t.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={async () => {
+                setIsRefreshing(true);
+                try {
+                  await queryClient.invalidateQueries({ queryKey: ["trips"] });
+                  await queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] });
+                  await queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+                } catch (err) {
+                  console.error("Refresh failed:", err);
+                } finally {
+                  setIsRefreshing(false);
+                }
+              }}
+              style={{
+                padding: '7px 11px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '8px',
+                color: '#fff',
+                cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                fontSize: '0.84rem',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                height: '36px',
+                flexShrink: 0,
+                opacity: isRefreshing ? 0.7 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (!isRefreshing) {
+                  e.target.style.background = 'rgba(255,255,255,0.12)';
+                  e.target.style.borderColor = 'rgba(255,255,255,0.25)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(255,255,255,0.08)';
+                e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+              }}
+              disabled={isRefreshing}
+            >
+              <svg 
+                width="14" 
+                height="14" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                style={{ 
+                  flexShrink: 0,
+                  animation: isRefreshing ? 'spin 1s linear infinite' : 'none'
+                }}
               >
-                {t.icon} {t.label}
-              </button>
-            ))}
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <polyline points="23 20 23 14 17 14"></polyline>
+                <path d="M20.49 9A9 9 0 0 0 5.64 5.64M3.51 15A9 9 0 0 0 18.36 18.36"></path>
+              </svg>
+              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
           </div>
           )}
 
@@ -1670,16 +1751,26 @@ export default function Dashboard() {
             <>
               {/* Search Bar (visible on myTrips, available, and history tabs) */}
               {(activeTab === "myTrips" || activeTab === "available" || activeTab === "history") && (
-                <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ marginBottom: "1rem" }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    padding: '10px 14px',
-                    gap: '8px'
-                  }}>
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '10px',
+                    padding: '9px 12px',
+                    gap: '8px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                  }}
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2">
                       <circle cx="11" cy="11" r="8"></circle>
                       <path d="m21 21-4.35-4.35"></path>
@@ -1736,19 +1827,31 @@ export default function Dashboard() {
                     className={`filter-toggle-btn ${showTagFilter ? "active" : ""}`}
                     onClick={() => setShowTagFilter(!showTagFilter)}
                     style={{
-                      padding: '0.6rem 1rem',
+                      padding: '7px 11px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(201,168,76,0.3)',
-                      background: showTagFilter ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.05)',
-                      color: showTagFilter ? '#ffd580' : 'rgba(255,255,255,0.6)',
+                      border: `1px solid ${showTagFilter ? 'rgba(201,168,76,0.4)' : 'rgba(201,168,76,0.2)'}`,
+                      background: showTagFilter ? 'rgba(201,168,76,0.12)' : 'rgba(255,255,255,0.03)',
+                      color: showTagFilter ? '#ffd580' : 'rgba(255,255,255,0.5)',
                       cursor: 'pointer',
-                      fontSize: '0.9rem',
+                      fontSize: '0.85rem',
                       fontWeight: 500,
-                      transition: 'all 0.2s',
-                      fontFamily: 'Poppins'
+                      transition: 'all 0.2s ease',
+                      fontFamily: 'Poppins',
+                      whiteSpace: 'nowrap',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = showTagFilter ? 'rgba(201,168,76,0.15)' : 'rgba(255,255,255,0.05)';
+                      e.target.style.borderColor = 'rgba(201,168,76,0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = showTagFilter ? 'rgba(201,168,76,0.12)' : 'rgba(255,255,255,0.03)';
+                      e.target.style.borderColor = showTagFilter ? 'rgba(201,168,76,0.4)' : 'rgba(201,168,76,0.2)';
                     }}
                   >
-                     Filter by Requirements {selectedFilterTags.length > 0 && `(${selectedFilterTags.length})`}
+                    Filter by Requirements {selectedFilterTags.length > 0 && `(${selectedFilterTags.length})`}
                   </button>
 
                   {showTagFilter && (
@@ -2160,6 +2263,11 @@ function TripCard({ trip, isCreator, isParticipant, onJoin, onLeave, onDelete, o
   };
 
   const getMatchGlow = () => {
+    // CRITICAL FIX: Don't show match highlights for joined trips
+    if (isCreator || isParticipant) {
+      return {};
+    }
+    
     const score = trip.avg_similarity ? parseInt(trip.avg_similarity) : 0;
     const isDarkMode = document.documentElement.getAttribute('data-theme') !== 'light';
     

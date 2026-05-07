@@ -38,7 +38,7 @@ export const useAllTrips = (enabled = true) => {
       return res.data || [];
     },
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 1 * 60 * 1000, // 1 minute (reduced for faster updates)
   });
 };
 
@@ -50,7 +50,7 @@ export const useRecommendedTrips = (enabled = true) => {
     queryKey: ["recommendedTrips"],
     queryFn: async () => {
       try {
-        const res = await api.get("trips/recommended/?limit=20");
+        const res = await api.get("trips/recommended/?limit=9999");
         return res.data?.results || res.data || [];
       } catch (err) {
         console.error("Failed to fetch recommended trips:", err);
@@ -58,7 +58,7 @@ export const useRecommendedTrips = (enabled = true) => {
       }
     },
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 1 * 60 * 1000, // 1 minute (reduced for faster updates)
   });
 };
 

@@ -21,6 +21,14 @@ const COLORS = {
   primaryHover: "#1565C0",
 };
 
+const getBackendOrigin = () => BACKEND_URL.replace(/\/api\/?$/, "");
+
+const getProfilePictureUrl = (user) => {
+  const picture = user.profile_picture || user.profile_pic || user.avatar;
+  if (!picture) return null;
+  return picture.startsWith("http") ? picture : `${getBackendOrigin()}${picture}`;
+};
+
 // Get similarity color based on score
 const getSimilarityColor = (similarity) => {
   if (similarity >= SIMILARITY_THRESHOLDS.high.min) return SIMILARITY_THRESHOLDS.high.color;
@@ -74,13 +82,17 @@ export default function UserSearchBar() {
         },
       });
       const data = await response.json();
-      setResults(data.results || []);
+      const users = (data.results || []).map(user => ({
+        ...user,
+        profile_picture: getProfilePictureUrl(user),
+      }));
+      setResults(users);
       setIsOpen(true);
       
       // Fetch similarity scores
-      if (data.results && data.results.length > 0) {
+      if (users.length > 0) {
         const simScores = {};
-        for (const user of data.results) {
+        for (const user of users) {
           try {
             const simResponse = await fetch(
               `${BACKEND_URL}users/similarity/${user.id}/`,
@@ -172,21 +184,20 @@ export default function UserSearchBar() {
                     className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 cursor-pointer transition border-b border-white/5 last:border-b-0"
                   >
                     {/* Profile Picture */}
-                    <div className="h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden" style={{ backgroundColor: COLORS.primary }}>
+                    <div className="relative h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden" style={{ backgroundColor: COLORS.primary }}>
+                      <span className="text-xs font-bold text-white">
+                        {(user.first_name || user.username)[0].toUpperCase()}
+                      </span>
                       {user.profile_picture ? (
                         <img
                           src={user.profile_picture}
                           alt={user.username}
-                          className="h-full w-full object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                           onError={(e) => {
-                            e.target.style.display = "none";
+                            e.currentTarget.style.display = "none";
                           }}
                         />
-                      ) : (
-                        <span className="text-xs font-bold text-white">
-                          {(user.first_name || user.username)[0].toUpperCase()}
-                        </span>
-                      )}
+                      ) : null}
                     </div>
 
                     {/* User Info */}
