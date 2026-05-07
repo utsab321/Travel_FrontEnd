@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuth } from "./context/AuthContext";
 import NavbarComponent from "./components/navbar";
 import Footer from "./components/Footer";
@@ -81,10 +82,22 @@ function Layout() {
 }
 
 function App() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+        retry: 1,
+      },
+    },
+  });
+
   return (
-    <Router>
-      <Layout />
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Layout />
+      </Router>
+    </QueryClientProvider>
   );
 }
 

@@ -1,10 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import useScrollbarExpand from "../hooks/useScrollbarExpand";
 import api from "../API/api";
 import KYCBanner from "../components/KYCBanner";
 import { DashboardLoadingSkeleton } from "../components/SkeletonLoaders";
+import {
+  useUserProfile,
+  useAllTrips,
+  useRecommendedTrips,
+  useTripHistory,
+  useInvitations,
+  useCities,
+  useDestinationRecommendations,
+} from "../hooks/useTripsData";
 import {
   PlusCircle,
   Compass,
@@ -177,11 +187,87 @@ const styles = `
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 20px;
     padding: 1.6rem;
-    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.3s, background-color 0.3s;
     cursor: default;
+    position: relative;
+    overflow: hidden;
   }
   .trip-card:hover {
     transform: translateY(-4px);
+  }
+
+  /* ──── MATCH SCORE COLOR SYSTEM ──── */
+  
+  /* High Match (> 70%) - Green Glow */
+  .trip-card.match-high {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(34, 197, 94, 0.08) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    box-shadow: 
+      0 0 30px rgba(34, 197, 94, 0.15),
+      0 0 60px rgba(34, 197, 94, 0.08),
+      0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .trip-card.match-high:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 
+      0 0 40px rgba(34, 197, 94, 0.25),
+      0 0 80px rgba(34, 197, 94, 0.12),
+      0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Medium Match (50-70%) - Yellow-Green Glow */
+  .trip-card.match-medium {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(234, 179, 8, 0.06) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.2);
+    box-shadow: 
+      0 0 25px rgba(234, 179, 8, 0.12),
+      0 0 50px rgba(234, 179, 8, 0.06),
+      0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .trip-card.match-medium:hover {
+    border-color: rgba(234, 179, 8, 0.3);
+    box-shadow: 
+      0 0 35px rgba(234, 179, 8, 0.18),
+      0 0 70px rgba(234, 179, 8, 0.09),
+      0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Low Match (30-50%) - Orange Glow */
+  .trip-card.match-low {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(249, 115, 22, 0.07) 100%);
+    border: 1px solid rgba(249, 115, 22, 0.22);
+    box-shadow: 
+      0 0 25px rgba(249, 115, 22, 0.13),
+      0 0 50px rgba(249, 115, 22, 0.07),
+      0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .trip-card.match-low:hover {
+    border-color: rgba(249, 115, 22, 0.32);
+    box-shadow: 
+      0 0 35px rgba(249, 115, 22, 0.19),
+      0 0 70px rgba(249, 115, 22, 0.1),
+      0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Poor Match (< 30%) - Red Glow */
+  .trip-card.match-poor {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 
+      0 0 20px rgba(239, 68, 68, 0.1),
+      0 0 40px rgba(239, 68, 68, 0.05),
+      0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+  .trip-card.match-poor:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 
+      0 0 30px rgba(239, 68, 68, 0.15),
+      0 0 60px rgba(239, 68, 68, 0.07),
+      0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  /* No match score - keep default hover */
+  .trip-card:not(.match-high):not(.match-medium):not(.match-low):not(.match-poor):hover {
     border-color: rgba(255,213,128,0.2);
     box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   }
@@ -402,6 +488,47 @@ const styles = `
   [data-theme="light"] .trip-card:hover {
     border-color: rgba(217, 119, 6, 0.2);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Light mode - Match score colors */
+  [data-theme="light"] .trip-card.match-high {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(34, 197, 94, 0.08) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.12), 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+  [data-theme="light"] .trip-card.match-high:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 35px rgba(34, 197, 94, 0.18), 0 20px 50px rgba(0, 0, 0, 0.12);
+  }
+
+  [data-theme="light"] .trip-card.match-medium {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(234, 179, 8, 0.06) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.24);
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.11), 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+  [data-theme="light"] .trip-card.match-medium:hover {
+    border-color: rgba(234, 179, 8, 0.32);
+    box-shadow: 0 0 30px rgba(234, 179, 8, 0.16), 0 20px 50px rgba(0, 0, 0, 0.12);
+  }
+
+  [data-theme="light"] .trip-card.match-low {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(249, 115, 22, 0.07) 100%);
+    border: 1px solid rgba(249, 115, 22, 0.26);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.12), 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+  [data-theme="light"] .trip-card.match-low:hover {
+    border-color: rgba(249, 115, 22, 0.35);
+    box-shadow: 0 0 30px rgba(249, 115, 22, 0.17), 0 20px 50px rgba(0, 0, 0, 0.12);
+  }
+
+  [data-theme="light"] .trip-card.match-poor {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.24);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.1), 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+  [data-theme="light"] .trip-card.match-poor:hover {
+    border-color: rgba(239, 68, 68, 0.32);
+    box-shadow: 0 0 28px rgba(239, 68, 68, 0.15), 0 20px 50px rgba(0, 0, 0, 0.12);
   }
 
   [data-theme="light"] .trip-title { color: #0d0d0d; }
@@ -651,10 +778,10 @@ const styles = `
   }
 
   [data-theme="light"] .db-stat,
-  [data-theme="light"] .trip-card,
+  [data-theme="light"] .trip-card:not(.match-high):not(.match-medium):not(.match-low):not(.match-poor),
   [data-theme="light"] .create-wrap,
   .db-root[data-theme="light"] .db-stat,
-  .db-root[data-theme="light"] .trip-card,
+  .db-root[data-theme="light"] .trip-card:not(.match-high):not(.match-medium):not(.match-low):not(.match-poor),
   .db-root[data-theme="light"] .create-wrap {
     background: var(--lm-panel) !important;
     border: 1px solid var(--lm-border) !important;
@@ -1091,141 +1218,130 @@ const styles = `
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Local state for UI interactions - declare early for React Query dependencies
   const [myTrips, setMyTrips] = useState([]);
   const [availableTrips, setAvailableTrips] = useState([]);
-  const [tripHistory, setTripHistory] = useState([]);
   const [stats, setStats] = useState({ created: 0, joined: 0, total: 0 });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("myTrips");
-  const [userProfileId, setUserProfileId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPageMyTrips, setCurrentPageMyTrips] = useState(1);
   const [currentPageAvailable, setCurrentPageAvailable] = useState(1);
   const [currentPageHistory, setCurrentPageHistory] = useState(1);
-  const [userProfile, setUserProfile] = useState(null);
-  const [kycLoading, setKycLoading] = useState(true);
   const [selectedFilterTags, setSelectedFilterTags] = useState([]);
   const [showTagFilter, setShowTagFilter] = useState(false);
-  const [invitations, setInvitations] = useState([]);
-  const [invLoading, setInvLoading] = useState(false);
-  const [destinationRecommendations, setDestinationRecommendations] = useState([]);
-  const [isSearchingDestination, setIsSearchingDestination] = useState(false);
+  const [destinationSearch, setDestinationSearch] = useState("");
   const itemsPerPage = 6;
 
+  // React Query hooks - will cache data and prevent redundant fetches
+  const {
+    data: userProfile,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useUserProfile(!!user);
+
+  const {
+    data: allTrips = [],
+    isLoading: tripsLoading,
+    error: tripsError,
+  } = useAllTrips(!!user);
+
+  const {
+    data: recommendedTrips = [],
+    isLoading: recommendedLoading,
+  } = useRecommendedTrips(!!user);
+
+  const {
+    data: tripHistory = [],
+    isLoading: historyLoading,
+  } = useTripHistory(!!user);
+
+  const {
+    data: invitationsList = [],
+    isLoading: invLoadingState,
+  } = useInvitations(activeTab === "invitations"); // Fetch when tab is opened
+
+  const { data: cities = [] } = useCities(!!user);
+
+  // Search destination recommendations
+  const {
+    data: destinationRecommendations = [],
+    isLoading: isSearchingDestination,
+  } = useDestinationRecommendations(destinationSearch, !!user);
+
+  // Determine overall loading state
+  const isLoading = profileLoading || tripsLoading;
+  const userProfileId = userProfile?.id;
+
+  // Redirect if not authenticated
   useEffect(() => {
-    if (!user) { navigate("/"); return; }
-    fetchDashboardData();
+    if (!user) {
+      navigate("/");
+    }
   }, [user, navigate]);
 
+  // Process trips data when allTrips or recommendedTrips change
   useEffect(() => {
-    if (activeTab === "invitations") {
-      fetchInvitations();
+    if (!userProfileId || !allTrips.length) return;
+
+    try {
+      const userTripsCreated = allTrips.filter(
+        (t) => t.creator?.id === userProfileId
+      );
+
+      const userTripsJoined = allTrips.filter((t) => {
+        let isParticipant = false;
+        if (Array.isArray(t.participants)) {
+          isParticipant = t.participants.some((p) => {
+            const pId = typeof p === "object" ? p.id : p;
+            return pId === userProfileId;
+          });
+        }
+        const isNotCreator = t.creator?.id !== userProfileId;
+        return isParticipant && isNotCreator;
+      });
+
+      const combined = [...userTripsCreated, ...userTripsJoined];
+
+      // Use recommended trips if available, otherwise fallback to basic filtering
+      const publicTrips =
+        recommendedTrips.length > 0
+          ? recommendedTrips
+          : allTrips.filter(
+              (t) =>
+                t.is_public && !combined.some((mt) => mt.id === t.id)
+            );
+
+      setMyTrips(combined);
+      setAvailableTrips(publicTrips);
+      setStats({
+        created: userTripsCreated.length,
+        joined: userTripsJoined.length,
+        total: allTrips.length,
+      });
+      setError("");
+    } catch (err) {
+      console.error("Error processing trips:", err);
+      setError("Failed to process trips data");
     }
-  }, [activeTab]);
+  }, [userProfileId, allTrips, recommendedTrips]);
 
   /* ── Enable scrollbar expansion on hover ── */
   useScrollbarExpand(".trips-grid, .scrollbar-expandable");
 
-  const fetchDashboardData = async () => {
-    setLoading(true); setError("");
-    try {
-      const token = localStorage.getItem("access_token");
-      
-      // Get user's UserProfile ID - use direct fetch since api.baseURL is /api/
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-      const meRes = await fetch(`${backendUrl}users/me/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const profile = await meRes.json();
-      const userId = profile?.id;
-      
-      if (!meRes.ok || !userId) {
-        const errorMsg = profile?.detail || `Failed to fetch user profile (${meRes.status})`;
-        throw new Error(errorMsg);
-      }
-      
-      setUserProfile(profile); // Store profile data for KYC status
-      setUserProfileId(userId); // Store for use in rendering
-      
-      const tripsRes = await api.get("trips/");
-      const allTrips = tripsRes.data || [];
-      
-      // Fetch recommended trips
-      let recommendedTrips = [];
-      try {
-        const recommendedRes = await api.get("trips/recommended/?limit=20");
-        recommendedTrips = recommendedRes.data?.results || recommendedRes.data || [];
-      } catch (recErr) {
-        console.error("Failed to fetch recommended trips:", recErr);
-        // Fallback to basic filtering
-      }
-      
-      // Fetch trip history
-      try {
-        const historyRes = await api.get("trips/history/");
-        const history = historyRes.data || [];
-        setTripHistory(history);
-      } catch (historyErr) {
-        console.error("Failed to fetch trip history:", historyErr);
-        setTripHistory([]);
-      }
-      
-      const userTripsCreated = allTrips.filter(t => {
-        const isCreator = t.creator?.id === userId;
-        return isCreator;
-      });
-      
-      const userTripsJoined = allTrips.filter(t => {
-        let isParticipant = false;
-        if (Array.isArray(t.participants)) {
-          isParticipant = t.participants.some(p => {
-            const pId = typeof p === 'object' ? p.id : p;
-            return pId === userId;
-          });
-        }
-        
-        const isNotCreator = t.creator?.id !== userId;
-        return isParticipant && isNotCreator;
-      });
-      
-      const combined = [...userTripsCreated, ...userTripsJoined];
-      
-      // Use recommended trips if available, otherwise fallback to basic filtering
-      const publicTrips = recommendedTrips.length > 0 
-        ? recommendedTrips 
-        : allTrips.filter(t =>
-            t.is_public && !combined.some(mt => mt.id === t.id)
-          );
-      
-
-      
-      setMyTrips(combined);
-      setAvailableTrips(publicTrips);
-      setStats({ created: userTripsCreated.length, joined: userTripsJoined.length, total: allTrips.length });
-    } catch (err) {
-      console.error("Dashboard error:", err);
-      console.error("Response status:", err.response?.status);
-      console.error("Response data:", err.response?.data);
-      const msg = err.response?.data?.detail || err.message || "Failed to load trips";
-      setError(msg);
-    } finally { 
-      setLoading(false);
-      setKycLoading(false);
-    }
-  };
-
   const handleJoinTrip = async (tripId) => {
     try {
-      const res = await api.patch(`trips/${tripId}/`, { action: "join" });
-      
+      const res = await api.post(`trips/${tripId}/join/`);
+
       // Send system message to trip chat
       try {
         const token = localStorage.getItem("access_token");
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+        const backendUrl =
+          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
         const userName = user?.user?.first_name || user?.user?.username || "A user";
-        await fetch(`${backendUrl.replace('/api/', '')}/api/chat/messages/`, {
+        await fetch(`${backendUrl.replace("/api/", "")}/api/chat/messages/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1239,33 +1355,33 @@ export default function Dashboard() {
         });
       } catch (chatErr) {
         console.warn("Failed to send join notification:", chatErr);
-        // Don't fail the join if chat message fails
       }
-      
-      // Wait a moment for backend to process, then refresh and switch to My Trips
-      setTimeout(() => {
-        fetchDashboardData(); 
-        setActiveTab("myTrips"); // Switch to My Trips tab to see the joined trip
-        setError("");
-      }, 100);
-    } catch (err) { 
+
+      // Invalidate caches to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] });
+
+      setActiveTab("myTrips");
+      setError("");
+    } catch (err) {
       console.error("Join trip error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Failed to join trip."); 
+      setError(err.response?.data?.message || "Failed to join trip.");
     }
   };
 
   const handleLeaveTrip = async (tripId) => {
     if (!window.confirm("Are you sure you want to leave this trip?")) return;
     try {
-      const res = await api.patch(`trips/${tripId}/`, { action: "leave" });
+      const res = await api.post(`trips/${tripId}/leave/`);
       console.log("Leave response:", res.data);
-      
+
       // Send system message to trip chat
       try {
         const token = localStorage.getItem("access_token");
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+        const backendUrl =
+          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
         const userName = user?.user?.first_name || user?.user?.username || "A user";
-        await fetch(`${backendUrl.replace('/api/', '')}/api/chat/messages/`, {
+        await fetch(`${backendUrl.replace("/api/", "")}/api/chat/messages/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1279,83 +1395,76 @@ export default function Dashboard() {
         });
       } catch (chatErr) {
         console.warn("Failed to send leave notification:", chatErr);
-        // Don't fail the leave if chat message fails
       }
-      
-      fetchDashboardData(); 
+
+      // Invalidate caches to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] });
+
       setError("");
-    } catch (err) { 
+    } catch (err) {
       console.error("Leave trip error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Failed to leave trip."); 
+      setError(err.response?.data?.message || "Failed to leave trip.");
     }
   };
 
   const handleDeleteTrip = async (tripId) => {
-    if (!window.confirm("Are you sure you want to delete this trip? This action cannot be undone.")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this trip? This action cannot be undone."
+      )
+    )
+      return;
     try {
       console.log("Deleting trip:", tripId);
       await api.delete(`trips/${tripId}/`);
       console.log("Trip deleted successfully");
-      fetchDashboardData(); 
-      setError("");
-    } catch (err) { 
-      console.error("Delete trip error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Failed to delete trip."); 
-    }
-  };
 
-  const fetchInvitations = async () => {
-    setInvLoading(true);
-    try {
-      const res = await api.get("trips/invitations/my/");
-      setInvitations(res.data || []);
-      console.log("Fetched invitations:", res.data);
+      // Invalidate caches to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] });
+
+      setError("");
     } catch (err) {
-      console.error("Failed to fetch invitations:", err.message);
-      setInvitations([]);
-    } finally {
-      setInvLoading(false);
+      console.error("Delete trip error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Failed to delete trip.");
     }
   };
 
   const handleRespondToInvitation = async (invitationId, action) => {
     try {
-      const res = await api.patch(`trips/invitations/${invitationId}/respond/`, { action });
+      const res = await api.patch(
+        `trips/invitations/${invitationId}/respond/`,
+        { action }
+      );
       console.log(`${action} invitation response:`, res.data);
-      
-      // Remove the invitation from the list
-      setInvitations(inv => inv.filter(i => i.id !== invitationId));
-      
+
+      // Invalidate invitations cache to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["invitations"] });
+
       if (action === "accept") {
         setError("");
-        // Refresh trips to show the newly joined trip
-        setTimeout(() => fetchDashboardData(), 100);
+        // Invalidate trips cache to show the newly joined trip
+        queryClient.invalidateQueries({ queryKey: ["trips"] });
+        queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] });
       }
     } catch (err) {
       console.error(`Failed to ${action} invitation:`, err.message);
-      setError(err.response?.data?.detail || `Failed to ${action} invitation`);
+      setError(
+        err.response?.data?.detail ||
+          `Failed to ${action} invitation`
+      );
     }
   };
 
   // Search for destination-specific recommendations
   const searchDestinationRecommendations = async (destination) => {
     if (!destination.trim()) {
-      setDestinationRecommendations([]);
+      setDestinationSearch("");
       return;
     }
-    
-    try {
-      setIsSearchingDestination(true);
-      const res = await api.get(`trips/recommended/?destination=${encodeURIComponent(destination)}&limit=20`);
-      const recommendations = res.data?.results || res.data || [];
-      console.log("Destination recommendations:", recommendations);
-      setDestinationRecommendations(recommendations);
-    } catch (err) {
-      console.error("Failed to search destination recommendations:", err);
-      setDestinationRecommendations([]);
-    } finally {
-      setIsSearchingDestination(false);
-    }
+
+    setDestinationSearch(destination);
   };
 
   const tabs = [
@@ -1414,13 +1523,12 @@ export default function Dashboard() {
   const handleSearchChange = (query) => {
     setSearchQuery(query);
     setCurrentPageAvailable(1);
-    
-    // If user is typing a destination-like query, fetch recommendations
+
+    // If user is typing a destination-like query, trigger React Query fetch
     if (query.trim().length > 0 && activeTab === "available") {
-      // Debounced destination search
       searchDestinationRecommendations(query);
     } else {
-      setDestinationRecommendations([]);
+      setDestinationSearch("");
     }
   };
 
@@ -1458,7 +1566,7 @@ export default function Dashboard() {
       <style>{styles}</style>
       
       {/* KYC Blocking Screen */}
-      {kycLoading ? (
+      {profileLoading ? (
         <div className="db-root">
           <DashboardLoadingSkeleton />
         </div>
@@ -1531,17 +1639,17 @@ export default function Dashboard() {
           </div>
 
           {/* KYC Banner */}
-          {userProfile && !loading && <KYCBanner status={userProfile.status} rejectionReason={userProfile.rejection_reason} />}
+          {userProfile && !isLoading && <KYCBanner status={userProfile.status} rejectionReason={userProfile.rejection_reason} />}
 
           {/* Error */}
-          {error && !loading && (
+          {error && !isLoading && (
             <div className="db-error">
               <AlertCircle size={16} /> {error}
             </div>
           )}
 
           {/* Tabs */}
-          {!loading && (
+          {!isLoading && (
           <div className="db-tabs">
             {tabs.map(t => (
               <button
@@ -1556,7 +1664,7 @@ export default function Dashboard() {
           )}
 
           {/* Content */}
-          {loading ? (
+          {isLoading ? (
             <DashboardLoadingSkeleton />
           ) : (
             <>
@@ -1739,11 +1847,11 @@ export default function Dashboard() {
 
               {activeTab === "invitations" && (
                 <>
-                  {invLoading ? (
+                  {invLoadingState ? (
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
                       <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
                     </div>
-                  ) : invitations.length === 0 ? (
+                  ) : invitationsList.length === 0 ? (
                     <EmptyState 
                       icon={<Mail size={28} />} 
                       title="No invitations yet" 
@@ -1753,7 +1861,7 @@ export default function Dashboard() {
                     />
                   ) : (
                     <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
-                      {invitations.map(inv => (
+                      {invitationsList.map(inv => (
                         <div
                           key={inv.id}
                           style={{
@@ -1856,6 +1964,7 @@ export default function Dashboard() {
                             <TripCard
                               key={trip.id} trip={trip}
                               isCreator={trip.creator?.id === userProfileId}
+                              isParticipant={true}
                               onJoin={() => handleJoinTrip(trip.id)}
                               onLeave={() => handleLeaveTrip(trip.id)}
                               onDelete={trip.participants?.length === 1 ? () => handleDeleteTrip(trip.id) : null}
@@ -1890,6 +1999,7 @@ export default function Dashboard() {
                               <TripCard
                                 key={trip.id} trip={trip}
                                 isCreator={false}
+                                isParticipant={isParticipant}
                                 onJoin={() => handleJoinTrip(trip.id)}
                                 onLeave={isParticipant ? () => handleLeaveTrip(trip.id) : null}
                                 onView={() => navigate(`/trip/${trip.id}`)}
@@ -1937,7 +2047,7 @@ export default function Dashboard() {
               )}
 
               {activeTab === "create" && (
-                <CreateTripSection onTripCreated={() => { fetchDashboardData(); setActiveTab("myTrips"); }} setActiveTab={setActiveTab} />
+                <CreateTripSection onTripCreated={() => { queryClient.invalidateQueries({ queryKey: ["trips"] }); queryClient.invalidateQueries({ queryKey: ["recommendedTrips"] }); setActiveTab("myTrips"); }} setActiveTab={setActiveTab} />
               )}
             </>
           )}
@@ -2037,9 +2147,90 @@ function StatCard({ icon, label, value, iconBg, iconColor }) {
   );
 }
 
-function TripCard({ trip, isCreator, onJoin, onLeave, onDelete, onView, kycApproved }) {
+function TripCard({ trip, isCreator, isParticipant, onJoin, onLeave, onDelete, onView, kycApproved }) {
+  // Determine match score styling with glow effect (dark & light mode support)
+  // Only show glow if user hasn't joined and isn't the creator
+  const getMatchClass = (score) => {
+    if (isCreator || isParticipant) return "";
+    if (!score && score !== 0) return "";
+    if (score > 70) return "match-high";
+    if (score > 50) return "match-medium";
+    if (score > 30) return "match-low";
+    return "match-poor";
+  };
+
+  const getMatchGlow = () => {
+    const score = trip.avg_similarity ? parseInt(trip.avg_similarity) : 0;
+    const isDarkMode = document.documentElement.getAttribute('data-theme') !== 'light';
+    
+    if (score >= 70) {
+      if (isDarkMode) {
+        return {
+          border: '1px solid rgba(34, 197, 94, 0.4)',
+          boxShadow: '0 0 20px rgba(34, 197, 94, 0.25), 0 0 40px rgba(34, 197, 94, 0.12), inset 0 0 15px rgba(34, 197, 94, 0.08)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(34, 197, 94, 0.5) 100%)',
+        };
+      } else {
+        // STRONG light mode: premium green highlight
+        return {
+          border: '2px solid rgba(34, 197, 94, 0.55)',
+          boxShadow: '0 0 24px rgba(34, 197, 94, 0.28), 0 0 48px rgba(34, 197, 94, 0.12), inset 0 0 20px rgba(34, 197, 94, 0.1)',
+          background: 'linear-gradient(135deg, rgba(245,243,240,1) 0%, rgba(34, 197, 94, 0.45) 100%)',
+        };
+      }
+    } else if (score >= 50) {
+      if (isDarkMode) {
+        return {
+          border: '1px solid rgba(234, 179, 8, 0.3)',
+          boxShadow: '0 0 18px rgba(234, 179, 8, 0.18), 0 0 36px rgba(234, 179, 8, 0.09), inset 0 0 12px rgba(234, 179, 8, 0.06)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(234, 179, 8, 0.45) 100%)',
+        };
+      } else {
+        // STRONG light mode: premium yellow-green highlight
+        return {
+          border: '2px solid rgba(168, 162, 10, 0.58)',
+          boxShadow: '0 0 22px rgba(168, 162, 10, 0.26), 0 0 44px rgba(168, 162, 10, 0.11), inset 0 0 18px rgba(168, 162, 10, 0.09)',
+          background: 'linear-gradient(135deg, rgba(245,243,240,1) 0%, rgba(168, 162, 10, 0.42) 100%)',
+        };
+      }
+    } else if (score >= 30) {
+      if (isDarkMode) {
+        return {
+          border: '1px solid rgba(249, 115, 22, 0.35)',
+          boxShadow: '0 0 18px rgba(249, 115, 22, 0.19), 0 0 36px rgba(249, 115, 22, 0.1), inset 0 0 12px rgba(249, 115, 22, 0.07)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(249, 115, 22, 0.48) 100%)',
+        };
+      } else {
+        // STRONG light mode: premium orange highlight
+        return {
+          border: '2px solid rgba(249, 115, 22, 0.56)',
+          boxShadow: '0 0 22px rgba(249, 115, 22, 0.27), 0 0 44px rgba(249, 115, 22, 0.11), inset 0 0 18px rgba(249, 115, 22, 0.1)',
+          background: 'linear-gradient(135deg, rgba(245,243,240,1) 0%, rgba(249, 115, 22, 0.44) 100%)',
+        };
+      }
+    } else {
+      if (isDarkMode) {
+        return {
+          border: '1px solid rgba(239, 68, 68, 0.28)',
+          boxShadow: '0 0 15px rgba(239, 68, 68, 0.14), 0 0 30px rgba(239, 68, 68, 0.07), inset 0 0 10px rgba(239, 68, 68, 0.05)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(239, 68, 68, 0.42) 100%)',
+        };
+      } else {
+        // STRONG light mode: premium red highlight
+        return {
+          border: '2px solid rgba(239, 68, 68, 0.52)',
+          boxShadow: '0 0 20px rgba(239, 68, 68, 0.24), 0 0 40px rgba(239, 68, 68, 0.1), inset 0 0 16px rgba(239, 68, 68, 0.08)',
+          background: 'linear-gradient(135deg, rgba(245,243,240,1) 0%, rgba(239, 68, 68, 0.38) 100%)',
+        };
+      }
+    }
+  };
+
+  const glowStyle = getMatchGlow();
+  const matchScore = trip.avg_similarity ? parseInt(trip.avg_similarity) : 0;
+
   return (
-    <div className="trip-card">
+    <div className={`trip-card ${getMatchClass(matchScore)}`} style={glowStyle}>
       <div className="trip-card-top">
         <div>
           <div className="trip-title">{trip.title}</div>
@@ -2118,14 +2309,6 @@ function TripCard({ trip, isCreator, onJoin, onLeave, onDelete, onView, kycAppro
             <span className="trip-meta-val">{trip.participants?.length || 0} joined</span>
           </div>
         </div>
-        {trip.match_count !== undefined && trip.match_count > 0 && (
-          <div className="trip-meta-item" style={{ backgroundColor: 'rgba(76, 175, 80, 0.15)' }}>
-            <div style={{ color: '#81c784', fontSize: '0.75rem', fontWeight: '600' }}>
-              <span className="trip-meta-label" style={{ color: 'rgba(129, 199, 132, 0.7)' }}>Match Score</span>
-              <span className="trip-meta-val" style={{ color: '#81c784' }}>{trip.match_count} people • {trip.avg_similarity}%</span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="trip-actions">
