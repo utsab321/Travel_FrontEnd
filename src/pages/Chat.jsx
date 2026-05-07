@@ -562,6 +562,7 @@ export default function Chat() {
                 : friend.username || "Friend",
               avatar: profilePic,
               userId: friend.id,
+              accountId: friend.user_id,
               unread: 0,
               lastMessage: "",
               lastMessageTime: null,
@@ -614,7 +615,7 @@ export default function Chat() {
         const selectedFriendId = sessionStorage.getItem("selectedFriendId");
         if (selectedFriendId) {
           const friendConvo = convos.find(
-            c => c.userId?.toString() === selectedFriendId
+            c => c.userId?.toString() === selectedFriendId || c.accountId?.toString() === selectedFriendId
           );
           if (friendConvo) setSelectedConversation(friendConvo);
           sessionStorage.removeItem("selectedFriendId");

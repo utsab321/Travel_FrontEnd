@@ -191,38 +191,26 @@ export default function UserProfile() {
       setError(null);
       const token = localStorage.getItem('access_token');
       
-      // Fetch user by username from search results
-      const searchResponse = await fetch(`http://127.0.0.1:8000/api/users/search/?q=${username}`, {
+      // Fetch profile directly by username so private users are not mistaken for missing users.
+      const profileResponse = await fetch(`http://127.0.0.1:8000/api/users/user-profile/by-username/${username}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
-      if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
-      const searchData = await searchResponse.json();
-      const results = searchData.results;
-      
-      const foundUser = results.find(u => u.username === username);
-      if (!foundUser) {
+      if (profileResponse.status === 404) {
         setError(MESSAGES.userNotFound);
         return;
       }
-
-      // Get full profile details
-      const profileResponse = await fetch(`http://127.0.0.1:8000/api/users/user-profile/${foundUser.id}/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
       
       // ✅ Handle private profile (403 Forbidden)
       if (profileResponse.status === 403) {
         const errorData = await profileResponse.json();
         setError(errorData.detail || "This profile is private. Send a friend request to view it.");
         // Still set basic user data so they can send friend request
-        setUserData(foundUser);
+        setUserData(errorData);
         
         // Still fetch friend status
-        const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${foundUser.id}/`, {
+        const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${errorData.id}/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -236,13 +224,10 @@ export default function UserProfile() {
       
       if (!profileResponse.ok) throw new Error(`Profile fetch failed: ${profileResponse.status}`);
       const profileData = await profileResponse.json();
-      setUserData({
-        ...foundUser,
-        ...profileData
-      });
+      setUserData(profileData);
 
       // Get similarity score
-      const similarityResponse = await fetch(`http://127.0.0.1:8000/api/users/similarity/${foundUser.id}/`, {
+      const similarityResponse = await fetch(`http://127.0.0.1:8000/api/users/similarity/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -255,7 +240,7 @@ export default function UserProfile() {
       }
 
       // Get friend request status
-      const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${foundUser.id}/`, {
+      const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -266,7 +251,7 @@ export default function UserProfile() {
       }
 
       // Fetch user's friends
-      const friendsResponse = await fetch(`http://127.0.0.1:8000/api/users/friends/${foundUser.id}/`, {
+      const friendsResponse = await fetch(`http://127.0.0.1:8000/api/users/friends/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -367,7 +352,7 @@ export default function UserProfile() {
   const handleStartChat = () => {
     if (!userData) return;
     // Store the friend ID temporarily so Chat.jsx can auto-select the conversation
-    sessionStorage.setItem('selectedFriendId', userData.id);
+    sessionStorage.setItem('selectedFriendId', userData.profile_id || userData.id);
     sessionStorage.setItem('selectedFriendName', userData.username);
     navigate('/chat');
   };

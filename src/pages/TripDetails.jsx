@@ -11,28 +11,81 @@ import TripInviteModal from "../components/TripInviteModal";
 import TripPhotos from "../components/TripPhotos";
 
 // ─── Palette ────────────────────────────────────────────────────────────────
-const C = {
-  bg:         "#07080f",
-  surface:    "#0d0f1c",
-  card:       "#0f1220",
-  border:     "#1a1d2e",
-  borderHi:   "#252840",
-  gold:       "#c8b882",
-  goldDim:    "#8a7040",
-  goldBg:     "rgba(200,184,130,0.08)",
-  goldRing:   "rgba(200,184,130,0.25)",
-  text:       "#f0ece0",
-  textSub:    "#8a8890",
-  textMuted:  "#4a4a60",
-  red:        "#c05050",
-  redBg:      "rgba(192,80,80,0.1)",
-  green:      "#50a878",
-  greenBg:    "rgba(80,168,120,0.1)",
-  blue:       "#5588cc",
-  blueBg:     "rgba(85,136,204,0.1)",
+const PALETTES = {
+  dark: {
+    bg:         "#07080f",
+    surface:    "#0d0f1c",
+    card:       "#0f1220",
+    border:     "#1a1d2e",
+    borderHi:   "#252840",
+    gold:       "#c8b882",
+    goldDim:    "#8a7040",
+    goldBg:     "rgba(200,184,130,0.08)",
+    goldRing:   "rgba(200,184,130,0.25)",
+    text:       "#f0ece0",
+    textSub:    "#8a8890",
+    textMuted:  "#4a4a60",
+    red:        "#c05050",
+    redBg:      "rgba(192,80,80,0.1)",
+    green:      "#50a878",
+    greenBg:    "rgba(80,168,120,0.1)",
+    blue:       "#5588cc",
+    blueBg:     "rgba(85,136,204,0.1)",
+    buttonText: "#0d0f1c",
+  },
+  light: {
+    bg:         "#f5f0e8",
+    surface:    "#ffffff",
+    card:       "#ffffff",
+    border:     "rgba(21,18,13,0.12)",
+    borderHi:   "rgba(21,18,13,0.22)",
+    gold:       "#d97706",
+    goldDim:    "#92400e",
+    goldBg:     "rgba(217,119,6,0.10)",
+    goldRing:   "rgba(217,119,6,0.28)",
+    text:       "#17130e",
+    textSub:    "#5f554b",
+    textMuted:  "#8b7d6f",
+    red:        "#dc2626",
+    redBg:      "rgba(220,38,38,0.10)",
+    green:      "#16a34a",
+    greenBg:    "rgba(22,163,74,0.10)",
+    blue:       "#2563eb",
+    blueBg:     "rgba(37,99,235,0.10)",
+    buttonText: "#ffffff",
+  },
 };
 
-const CHART_COLORS = ["#c8b882","#5588cc","#50a878","#c05050","#9b88cc","#cc8855","#55a8cc","#cc5588"];
+const C = PALETTES.dark;
+const CHART_COLOR_PALETTES = {
+  dark: ["#c8b882","#5588cc","#50a878","#c05050","#9b88cc","#cc8855","#55a8cc","#cc5588"],
+  light: ["#d97706","#2563eb","#16a34a","#dc2626","#7c3aed","#ea580c","#0891b2","#be185d"],
+};
+
+const getTheme = () => {
+  if (typeof document === "undefined") return "dark";
+  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+};
+
+function useThemePalette() {
+  const [theme, setTheme] = useState(getTheme());
+
+  useEffect(() => {
+    const syncTheme = () => setTheme(getTheme());
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    window.addEventListener("theme-changed", syncTheme);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("theme-changed", syncTheme);
+    };
+  }, []);
+
+  return {
+    colors: PALETTES[theme],
+    chartColors: CHART_COLOR_PALETTES[theme],
+  };
+}
 
 const TEXTS = {
   loadingTrip: "Loading trip…",
@@ -72,9 +125,9 @@ function Avatar({ name = "?", size = 36, style = {}, src = null }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: "50%", flexShrink: 0,
-      background: `linear-gradient(135deg, ${C.gold}, ${C.goldDim})`,
+      background: `linear-gradient(135deg, var(--td-gold, ${C.gold}), var(--td-gold-dim, ${C.goldDim}))`,
       display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: size * 0.36, fontWeight: 600, color: "#0d0f1c",
+      fontSize: size * 0.36, fontWeight: 600, color: "var(--td-button-text, #0d0f1c)",
       letterSpacing: "-0.5px", overflow: "hidden", ...style
     }}>
       {imageUrl ? <img src={imageUrl} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
@@ -95,8 +148,8 @@ function Badge({ children, color = C.gold, bg }) {
 function SectionTitle({ children }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-      <span style={{ width: 3, height: 18, borderRadius: 2, background: C.gold, flexShrink: 0 }} />
-      <h2 style={{ fontSize: 16, fontWeight: 600, color: C.text, letterSpacing: "-0.2px" }}>{children}</h2>
+      <span style={{ width: 3, height: 18, borderRadius: 2, background: `var(--td-gold, ${C.gold})`, flexShrink: 0 }} />
+      <h2 style={{ fontSize: 16, fontWeight: 600, color: `var(--td-text, ${C.text})`, letterSpacing: "-0.2px" }}>{children}</h2>
     </div>
   );
 }
@@ -105,6 +158,7 @@ function SectionTitle({ children }) {
 export default function TripDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { colors: C, chartColors: CHART_COLORS } = useThemePalette();
 
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -428,7 +482,16 @@ export default function TripDetail() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: C.bg,
+      color: C.text,
+      fontFamily: "'DM Sans', sans-serif",
+      "--td-gold": C.gold,
+      "--td-gold-dim": C.goldDim,
+      "--td-text": C.text,
+      "--td-button-text": C.buttonText,
+    }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
         * { box-sizing: border-box; }
@@ -444,7 +507,7 @@ export default function TripDetail() {
         .td-participant:hover { border-color: ${C.goldRing} !important; background: ${C.goldBg} !important; }
         .td-day-item:hover { border-color: ${C.goldRing} !important; }
         .td-msg-bubble { transition: background 0.1s; }
-        .td-msg-bubble:hover { background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .td-msg-bubble:hover { background: ${C.goldBg}; border-radius: 8px; }
         .td-back-btn:hover { color: ${C.gold} !important; }
         .td-tag { transition: border-color 0.15s; }
         .td-tag:hover { border-color: ${C.gold} !important; }
@@ -486,7 +549,7 @@ export default function TripDetail() {
       {trip?.cover_image && (
         <div style={{ height: 280, overflow: "hidden", position: "relative" }}>
           <img src={trip.cover_image} alt={trip.title} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, #07080f 100%)" }} />
+          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, transparent 40%, ${C.bg} 100%)` }} />
         </div>
       )}
 
@@ -708,7 +771,7 @@ export default function TripDetail() {
                       <button
                         onClick={handleSubmitReview}
                         disabled={submittingReview || !reviewText.trim()}
-                        style={{ padding: "8px 18px", background: C.gold, border: "none", borderRadius: 9, color: "#0d0f1c", fontSize: 13, fontWeight: 600, cursor: submittingReview || !reviewText.trim() ? "not-allowed" : "pointer", opacity: submittingReview || !reviewText.trim() ? 0.4 : 1, fontFamily: "inherit" }}
+                        style={{ padding: "8px 18px", background: C.gold, border: "none", borderRadius: 9, color: C.buttonText, fontSize: 13, fontWeight: 600, cursor: submittingReview || !reviewText.trim() ? "not-allowed" : "pointer", opacity: submittingReview || !reviewText.trim() ? 0.4 : 1, fontFamily: "inherit" }}
                       >{submittingReview ? (userReview ? "Updating…" : "Submitting…") : (userReview ? "Update" : "Submit")}</button>
                     </div>
                   </div>
@@ -844,8 +907,8 @@ export default function TripDetail() {
                   />
                   <button type="submit" className="td-btn-send" disabled={sendingMessage || !messageInput.trim()}>
                     {sendingMessage
-                      ? <Loader2 size={15} color="#0d0f1c" className="animate-spin" />
-                      : <Send size={15} color="#0d0f1c" />
+                      ? <Loader2 size={15} color={C.buttonText} className="animate-spin" />
+                      : <Send size={15} color={C.buttonText} />
                     }
                   </button>
                 </form>
@@ -890,7 +953,7 @@ export default function TripDetail() {
               <button
                 onClick={handleSaveDescription}
                 disabled={savingDescription}
-                style={{ padding: "8px 16px", background: C.gold, border: "none", borderRadius: 8, color: "#0d0f1c", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: savingDescription ? 0.6 : 1 }}
+                style={{ padding: "8px 16px", background: C.gold, border: "none", borderRadius: 8, color: C.buttonText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: savingDescription ? 0.6 : 1 }}
               >
                 {savingDescription ? "Saving..." : "Save"}
               </button>
@@ -947,7 +1010,7 @@ export default function TripDetail() {
               <button
                 onClick={handleSaveExpenses}
                 disabled={savingExpenses}
-                style={{ padding: "8px 16px", background: C.gold, border: "none", borderRadius: 8, color: "#0d0f1c", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: savingExpenses ? 0.6 : 1 }}
+                style={{ padding: "8px 16px", background: C.gold, border: "none", borderRadius: 8, color: C.buttonText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", opacity: savingExpenses ? 0.6 : 1 }}
               >
                 {savingExpenses ? "Saving..." : "Save"}
               </button>
