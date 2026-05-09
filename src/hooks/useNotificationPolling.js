@@ -18,9 +18,9 @@ export const useNotificationPolling = () => {
 
         // Fetch all notifications in parallel
         const [messagesRes, friendRes, tripRes] = await Promise.all([
-          api.get("chat/messages/unread/").catch(() => ({ data: { results: [] } })),
-          api.get("users/friend-requests/pending/").catch(() => ({ data: { pending_requests: [] } })),
-          api.get("trips/notifications/").catch(() => ({ data: [] }))
+          api.get("/api/chat/messages/unread/").catch(() => ({ data: { results: [] } })),
+          api.get("/api/users/friend-requests/pending/").catch(() => ({ data: { pending_requests: [] } })),
+          api.get("/api/trips/notifications/").catch(() => ({ data: [] }))
         ]);
 
         // Process messages

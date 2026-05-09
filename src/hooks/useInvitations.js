@@ -22,13 +22,13 @@ export const useInvitations = (tripId) => {
       setError('');
 
       // TODO: Replace with actual API endpoint
-      // const response = await api.post(`/trips/${tripId}/generate-invite-link/`);
-      // setInviteLink(response.data.link);
+      const response = await api.post(`/api/trips/${tripId}/generate-invite-link/`);
+      setInviteLink(response.data.invite_link);
 
       // Mock implementation
-      const code = generateRandomCode(8);
-      const link = `${window.location.origin}/invite/${tripId}/${code}`;
-      setInviteLink(link);
+      // const code = generateRandomCode(8);
+      // const link = `${window.location.origin}/invite/${tripId}/${code}`;
+      // setInviteLink(link);
     } catch (err) {
       setError('Failed to generate invite link');
       console.error('Generate invite link error:', err);
@@ -46,13 +46,13 @@ export const useInvitations = (tripId) => {
       setError('');
 
       // TODO: Replace with actual API endpoint
-      // const response = await api.post(`/trips/${tripId}/regenerate-invite-link/`);
-      // setInviteLink(response.data.link);
+      const response = await api.post(`/api/trips/${tripId}/regenerate-invite-link/`);
+      setInviteLink(response.data.link);
 
       // Mock implementation
-      const code = generateRandomCode(8);
-      const link = `${window.location.origin}/invite/${tripId}/${code}`;
-      setInviteLink(link);
+      // const code = generateRandomCode(8);
+      // const link = `${window.location.origin}/invite/${tripId}/${code}`;
+      // setInviteLink(link);
       setSuccess('Invite link regenerated');
     } catch (err) {
       setError('Failed to regenerate invite link');
@@ -75,19 +75,19 @@ export const useInvitations = (tripId) => {
       }
 
       // TODO: Replace with actual API endpoint
-      // const response = await api.post(`/trips/${tripId}/invitations/`, {
-      //   emails: emails,
-      //   role: role,
-      // });
+      const response = await api.post(`/api/trips/${tripId}/invitations/`, {
+        emails: emails,
+        role: role,
+      });
 
       // Mock implementation - simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // await new Promise(resolve => setTimeout(resolve, 500));
 
       setSuccess(`Successfully sent ${emails.length} invitation(s)`);
       await fetchPendingInvitations();
       return true;
     } catch (err) {
-      setError(err.message || 'Failed to send invitations');
+      setError(err.response?.data?.message || 'Failed to send invitations');
       return false;
     } finally {
       setLoading(false);
@@ -100,11 +100,11 @@ export const useInvitations = (tripId) => {
   const fetchPendingInvitations = useCallback(async () => {
     try {
       // TODO: Replace with actual API endpoint
-      // const response = await api.get(`/trips/${tripId}/invitations/`);
-      // setPendingInvites(response.data);
+      const response = await api.get(`/api/trips/${tripId}/invitations/`);
+      setPendingInvites(response.data);
 
       // Mock implementation
-      setPendingInvites([]);
+      // setPendingInvites([]);
     } catch (err) {
       console.error('Fetch pending invitations error:', err);
     }
@@ -119,9 +119,9 @@ export const useInvitations = (tripId) => {
       setError('');
 
       // TODO: Replace with actual API endpoint
-      // await api.patch(`/trips/${tripId}/invitations/${inviteId}/`, {
-      //   action: 'accept',
-      // });
+      await api.patch(`/api/trips/${tripId}/invitations/${inviteId}/`, {
+        action: 'accept',
+      });
 
       setSuccess('Invitation accepted');
       await fetchPendingInvitations();
@@ -143,9 +143,9 @@ export const useInvitations = (tripId) => {
       setError('');
 
       // TODO: Replace with actual API endpoint
-      // await api.patch(`/trips/${tripId}/invitations/${inviteId}/`, {
-      //   action: 'decline',
-      // });
+      await api.patch(`/api/trips/${tripId}/invitations/${inviteId}/`, {
+        action: 'decline',
+      });
 
       setSuccess('Invitation declined');
       await fetchPendingInvitations();
@@ -167,10 +167,10 @@ export const useInvitations = (tripId) => {
       setError('');
 
       // TODO: Replace with actual API endpoint
-      // await api.delete(`/trips/${tripId}/invitations/${inviteId}/`);
+      await api.delete(`/api/trips/${tripId}/invitations/${inviteId}/`);
 
       // Mock implementation
-      setPendingInvites(pendingInvites.filter(i => i.id !== inviteId));
+      setPendingInvites(pendingInvite=>pendingInvites.filter(i => i.id !== inviteId));
 
       setSuccess('Invitation revoked');
       return true;
@@ -193,9 +193,9 @@ export const useInvitations = (tripId) => {
   /**
    * Helper: Generate random code
    */
-  const generateRandomCode = (length) => {
-    return Math.random().toString(36).substring(2, length + 2).toUpperCase();
-  };
+    // const generateRandomCode = (length) => {
+    //   return Math.random().toString(36).substring(2, length + 2).toUpperCase();
+    // };
 
   return {
     // State

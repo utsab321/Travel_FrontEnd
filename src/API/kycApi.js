@@ -12,16 +12,16 @@ export const kycApi = {
 
   // 👤 Get logged-in user's KYC
   getMyKYC: () => {
-    return api.get("kyc/");
+    return api.get("/api/kyc/");
   },
 
   // 🔍 Get KYC by ID (admin use)
   getKYCById: (id) => {
-    return api.get(`kyc/${id}/`);
+    return api.get(`/api/kyc/${id}/`);
   },
 
   // ✅ Review KYC (admin)
   reviewKYC: (id, data) => {
-    return api.patch(`kyc/${id}/review/`, data);
+    return api.patch(`/api/kyc/${id}/review/`, data);
   },
 };  

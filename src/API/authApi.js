@@ -3,7 +3,7 @@ import api from "./api";
 export const authApi = {
   // 🆕 Register user
   register: async (data) => {
-    const response = await api.post("register/", data);
+    const response = await api.post("/api/register/", data);
 
     // Store tokens with correct keys
     if (response.data.access) {
@@ -19,7 +19,7 @@ export const authApi = {
 
   // 🔐 Login user
   login: async (data) => {
-    const response = await api.post("login/", data);
+    const response = await api.post("/api/login/", data);
 
     localStorage.setItem("access_token", response.data.access);
     localStorage.setItem("refresh_token", response.data.refresh);
@@ -40,7 +40,7 @@ export const authApi = {
   refreshToken: async () => {
     const refresh = localStorage.getItem("refresh_token");
 
-    const response = await api.post("token/refresh/", {
+    const response = await api.post("/api/token/refresh/", {
       refresh,
     });
 
