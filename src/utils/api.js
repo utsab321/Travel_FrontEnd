@@ -2,11 +2,14 @@
  * API utility with automatic token handling and 401 error management
  */
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000".replace(/\/$/, "");
+const API_BASE = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 
 /**
  * Get the base URL without /api/
  */
+export const getBaseUrl = () => {
+  return API_BASE.replace(/\/$/, "");
+};
 // export const getBaseUrl = () => {
 //   const url = API_BASE.replace('/api/', '');
 //   // Ensure trailing slash
