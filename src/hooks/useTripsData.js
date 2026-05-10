@@ -34,7 +34,9 @@ export const useAllTrips = (enabled = true) => {
   return useQuery({
     queryKey: ["trips"],
     queryFn: async () => {
-      const res = await api.get("/api/trips/");
+    const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const res = await api.get(`${backendUrl}/api/trips/`);
       return res.data || [];
     },
     enabled,
@@ -50,7 +52,9 @@ export const useRecommendedTrips = (enabled = true) => {
     queryKey: ["recommendedTrips"],
     queryFn: async () => {
       try {
-        const res = await api.get("/api/trips/recommended/?limit=9999");
+        const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+        const res = await api.get(`${backendUrl}/api/trips/recommended/?limit=9999`);
         return res.data?.results || res.data || [];
       } catch (err) {
         console.error("Failed to fetch recommended trips:", err);
@@ -70,7 +74,9 @@ export const useTripHistory = (enabled = true) => {
     queryKey: ["tripHistory"],
     queryFn: async () => {
       try {
-        const res = await api.get("/api/trips/history/");
+        const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+        const res = await api.get(`${backendUrl}/api/trips/history/`);
         return res.data || [];
       } catch (err) {
         console.error("Failed to fetch trip history:", err);
@@ -89,7 +95,9 @@ export const useInvitations = (enabled = true) => {
   return useQuery({
     queryKey: ["invitations"],
     queryFn: async () => {
-      const res = await api.get("/api/trips/invitations/my/");
+      const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const res = await api.get(`${backendUrl}/api/trips/invitations/my/`);
       return res.data || [];
     },
     enabled,
@@ -104,7 +112,9 @@ export const useCities = (enabled = true) => {
   return useQuery({
     queryKey: ["cities"],
     queryFn: async () => {
-      const res = await api.get("/api/trips/cities/");
+      const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const res = await api.get(`${backendUrl}/api/trips/cities/`);
       return res.data || [];
     },
     enabled,
@@ -119,8 +129,10 @@ export const useDestinationRecommendations = (destination, enabled = true) => {
   return useQuery({
     queryKey: ["destinationRecommendations", destination],
     queryFn: async () => {
+      const backendUrl =
+        process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
       const res = await api.get(
-        `/api/trips/recommended/?destination=${encodeURIComponent(destination)}&limit=20`
+        `${backendUrl}/api/trips/recommended/?destination=${encodeURIComponent(destination)}&limit=20`
       );
       return res.data?.results || res.data || [];
     },
