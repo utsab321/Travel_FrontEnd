@@ -34,7 +34,7 @@ export const authApi = {
   },
 
   // 👤 Get current user
-  getMe: () => api.get("user/"),
+  getMe: () => api.get("/api/user/"),
 
   // 🔄 Refresh token
   refreshToken: async () => {
