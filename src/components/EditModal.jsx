@@ -54,10 +54,10 @@ const FORM_LABELS = {
   soloRight: "Group",
 };
 
-const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 const getApiUrl = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-  return backendUrl.replace('/api/', '');
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+  return backendUrl;
 };
 const token = () => localStorage.getItem("access_token");
 const avatar = (url) =>
@@ -221,7 +221,7 @@ export default function EditModal({ profile, onClose, onSaved }) {
         fd.append("profile_photo", photoFile);
       }
       
-      const apiUrl = `${API}users/profile/update/`;
+      const apiUrl = `${API}/users/profile/update/`;
       
       const res = await fetch(apiUrl, {
         method: "PATCH",

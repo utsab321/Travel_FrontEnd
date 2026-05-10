@@ -351,14 +351,14 @@ export default function SuggestPeople({ currentUserId }) {
           let suggestions = [];
           
           try {
-            const similarData = await apiFetch("users/matches/");
+            const similarData = await apiFetch("/api/users/matches/");
             
             if (Array.isArray(similarData) && similarData.length > 0) {
               const enhancedMatches = [];
               
               for (const match of similarData) {
                 try {
-                  const userSearch = await apiFetch(`users/search/?q=${encodeURIComponent(match.username)}`);
+                  const userSearch = await apiFetch(`/api/users/search/?q=${encodeURIComponent(match.username)}`);
                   if (userSearch.results && userSearch.results.length > 0) {
                     const user = userSearch.results[0];
                     user.mutual_friends_count = 0;
@@ -402,7 +402,7 @@ export default function SuggestPeople({ currentUserId }) {
         // First, fetch user's profile to check completeness
         let userProfile = null;
         try {
-          userProfile = await apiFetch("users/me/");
+          userProfile = await apiFetch("/api/users/me/");
         } catch (err) {
           // Silent fail - continue without profile check
         }
@@ -425,14 +425,14 @@ export default function SuggestPeople({ currentUserId }) {
         let suggestions = [];
         
         try {
-          const similarData = await apiFetch("users/matches/");
+          const similarData = await apiFetch("/api/users/matches/");
           
           if (Array.isArray(similarData) && similarData.length > 0) {
             const enhancedMatches = [];
             
             for (const match of similarData) {
               try {
-                const userSearch = await apiFetch(`users/search/?q=${encodeURIComponent(match.username)}`);
+                const userSearch = await apiFetch(`/api/users/search/?q=${encodeURIComponent(match.username)}`);
                 if (userSearch.results && userSearch.results.length > 0) {
                   const user = userSearch.results[0];
                   
@@ -476,7 +476,7 @@ export default function SuggestPeople({ currentUserId }) {
 
   const handleAddFriend = async (userId) => {
     try {
-      await apiFetch(`users/friend-request/send/${userId}/`, { method: "POST" });
+      await apiFetch(`/api/users/friend-request/send/${userId}/`, { method: "POST" });
       setPendingRequests([...pendingRequests, userId]);
       alert("Friend request sent!");
     } catch (err) {
@@ -486,7 +486,7 @@ export default function SuggestPeople({ currentUserId }) {
 
   const handleCancelRequest = async (userId) => {
     try {
-      await apiFetch(`users/friend-request/cancel/${userId}/`, { method: "POST" });
+      await apiFetch(`/api/users/friend-request/cancel/${userId}/`, { method: "POST" });
       setPendingRequests(pendingRequests.filter(id => id !== userId));
       alert("Friend request cancelled!");
     } catch (err) {

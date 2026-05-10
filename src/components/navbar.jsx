@@ -35,7 +35,7 @@ export default function NavbarComponent() {
     if (!token) return;
     
     try {
-      const data = await apiFetch("users/me/");
+      const data = await apiFetch("/api/users/me/");
       if (data?.profile_picture) {
         const url = data.profile_picture.startsWith("http")
           ? data.profile_picture
@@ -49,7 +49,7 @@ export default function NavbarComponent() {
     }
     
     try {
-      const data = await apiFetch("users/friend-requests/pending/");
+      const data = await apiFetch("/api/users/friend-requests/pending/");
       setPendingRequestsCount(data?.pending_requests?.length || 0);
     } catch (error) {
       setPendingRequestsCount(0);
@@ -95,7 +95,7 @@ export default function NavbarComponent() {
     const interval = setInterval(() => {
       const token = getToken();
       if (token) {
-        apiFetch("users/friend-requests/pending/")
+        apiFetch("/api/users/friend-requests/pending/")
           .then(data => setPendingRequestsCount(data?.pending_requests?.length || 0))
           .catch(() => setPendingRequestsCount(0));
       }
@@ -137,7 +137,7 @@ export default function NavbarComponent() {
       const token = localStorage.getItem("access_token");
       if (token) {
         const API_BASE = process.env.REACT_APP_API_BASE || "http://127.0.0.1:8000";
-        fetch(`${API_BASE.replace('/api/', '')}/api/users/me/preferences/`, {
+        fetch(`${API_BASE}/api/users/me/preferences/`, {
           method: "PATCH",
           headers: {
             "Authorization": `Bearer ${token}`,

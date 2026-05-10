@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Upload, Trash2, X, Camera } from "lucide-react";
 
-const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 
 const getApiUrl = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-  return backendUrl.replace('/api/', '');
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+  return backendUrl;
 };
 
 const token = () => localStorage.getItem("access_token");
@@ -33,7 +33,7 @@ export default function TripPhotos({ tripId, isCompleted, currentUserId }) {
   const fetchPhotos = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API}trips/${tripId}/photos/`, {
+      const response = await fetch(`${API}/api/trips/${tripId}/photos/`, {
         headers: { Authorization: `Bearer ${token()}` },
       });
       if (response.ok) {
@@ -73,7 +73,7 @@ export default function TripPhotos({ tripId, isCompleted, currentUserId }) {
     formData.append("caption", caption);
 
     try {
-      const response = await fetch(`${API}trips/${tripId}/photos/`, {
+      const response = await fetch(`${API}/api/trips/${tripId}/photos/`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token()}` },
         body: formData,
@@ -102,7 +102,7 @@ export default function TripPhotos({ tripId, isCompleted, currentUserId }) {
     if (!window.confirm("Delete this photo?")) return;
 
     try {
-      const response = await fetch(`${API}trips/${photoId}/`, {
+      const response = await fetch(`${API}/api//trips/${photoId}/`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token()}` },
       });

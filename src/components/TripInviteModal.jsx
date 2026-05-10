@@ -51,8 +51,8 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
     try {
       setLoading(true);
       setError('');
-      
-      const response = await fetch(`http://127.0.0.1:8000/api/trips/${tripId}/generate-invite-link/`, {
+      const backendUrl= process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/trips/${tripId}/generate-invite-link/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -101,8 +101,8 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
     try {
       setLoadingPeople(true);
       setError('');
-
-      const response = await fetch(`http://127.0.0.1:8000/api/users/suggestions/?trip_id=${tripId}`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/users/suggestions/?trip_id=${tripId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -175,7 +175,8 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
       setError('');
 
       // Call actual API endpoint
-      const response = await fetch(`http://127.0.0.1:8000/api/trips/${tripId}/invitations/`, {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/trips/${tripId}/invitations/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -214,7 +215,8 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
       setLoadingPending(true);
 
       // Fetch actual API data
-      const response = await fetch(`http://127.0.0.1:8000/api/trips/${tripId}/invitations/`, {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/trips/${tripId}/invitations/`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
           'Content-Type': 'application/json'
@@ -248,7 +250,8 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
       setError('');
 
       // Call actual API endpoint
-      const response = await fetch(`http://127.0.0.1:8000/api/trips/${tripId}/invitations/${inviteId}/`, {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/trips/${tripId}/invitations/${inviteId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -451,7 +454,7 @@ const TripInviteModal = ({ tripId, tripTitle, onClose, isOpen, currentUserId, is
               ) : (
                 <div className="invite-people-list">
                   {filteredPeople.map((person) => {
-                    const baseUrl = (process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/").replace('/api/', '');
+                    const baseUrl = (process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000");
                     const profilePicUrl = person.profile_picture && (
                       person.profile_picture.startsWith('http') 
                         ? person.profile_picture 

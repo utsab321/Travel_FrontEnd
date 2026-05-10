@@ -2,16 +2,16 @@
  * API utility with automatic token handling and 401 error management
  */
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+const API_BASE = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000".replace(/\/$/, "");
 
 /**
  * Get the base URL without /api/
  */
-export const getBaseUrl = () => {
-  const url = API_BASE.replace('/api/', '');
-  // Ensure trailing slash
-  return url.endsWith('/') ? url : url + '/';
-};
+// export const getBaseUrl = () => {
+//   const url = API_BASE.replace('/api/', '');
+//   // Ensure trailing slash
+//   return url.endsWith('/') ? url : url + '/';
+// };
 
 /**
  * Get the access token from localStorage

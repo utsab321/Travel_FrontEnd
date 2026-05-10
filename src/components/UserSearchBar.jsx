@@ -6,7 +6,7 @@ import { Search, Loader2, X, Zap } from "lucide-react";
 // CONSTANTS
 // ============================================
 const DEBOUNCE_TIME = 300;
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 const PLACEHOLDER = "Search users...";
 
 const SIMILARITY_THRESHOLDS = {

@@ -36,8 +36,8 @@ export default function NotificationBell() {
       }
       
       const [tripRes, messagesRes] = await Promise.all([
-        api.get("trips/notifications/unread-count/"),
-        api.get("chat/messages/unread/")
+        api.get("/api/trips/notifications/unread-count/"),
+        api.get("/api/chat/messages/unread/")
       ]);
       const tripCount = tripRes.data?.unread_count || 0;
       // Only count truly unread messages (is_read: false)

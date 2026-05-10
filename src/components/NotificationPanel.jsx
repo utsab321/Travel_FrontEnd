@@ -33,9 +33,9 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
       
       // Fetch trip notifications, friend requests, and unread messages
       const [tripRes, friendRes, messagesRes] = await Promise.all([
-        api.get("trips/notifications/"),
-        api.get("users/friend-requests/pending/"),
-        api.get("chat/messages/unread/")
+        api.get("/api/trips/notifications/"),
+        api.get("/api/users/friend-requests/pending/"),
+        api.get("/api/chat/messages/unread/")
       ]);
       
       const tripNotifs = tripRes.data || [];
@@ -163,7 +163,7 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
     if (notification.is_read) return;
 
     try {
-      await api.patch(`trips/notifications/${notification.id}/read/`);
+      await api.patch(`/api/trips/notifications/${notification.id}/read/`);
       // Remove notification from list once marked as read
       setNotifications(prev => {
         const updated = prev.filter(n => n.id !== notification.id);
@@ -204,7 +204,7 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
           return Promise.resolve();
         }
         console.log("Marking message ID:", msgId);
-        return api.patch(`chat/messages/${msgId}/mark_as_read/`)
+        return api.patch(`/api/chat/messages/${msgId}/mark_as_read/`)
           .catch(err => {
             console.error(`Failed to mark message ${msgId} as read:`, err);
             // Continue with other messages even if one fails
@@ -271,7 +271,7 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await api.patch("trips/notifications/read-all/");
+      await api.patch("/api/trips/notifications/read-all/");
       // Clear all notifications (they're all now read)
       setNotifications([]);
       onUnreadChange(0);
@@ -295,7 +295,7 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
         return;
       }
       
-      const response = await api.patch(`trips/invitations/${notification.invitation}/respond/`, { action });
+      const response = await api.patch(`/api/trips/invitations/${notification.invitation}/respond/`, { action });
       
       if (response.status === 200 || response.status === 201) {
         // Remove notification from list
@@ -322,7 +322,7 @@ export default function NotificationPanel({ onClose, onUnreadChange }) {
   const handleFriendRequestResponse = async (notification, action) => {
     setRequestAction(prev => ({ ...prev, [notification.id]: true }));
     try {
-      const response = await api.post(`users/friend-request/${notification.friend_request_id}/respond/`, { action });
+      const response = await api.post(`/api/users/friend-request/${notification.friend_request_id}/respond/`, { action });
       
       if (response.status === 200 || response.status === 201) {
         // Remove the notification from the list
