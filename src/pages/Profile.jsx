@@ -177,7 +177,7 @@ function ProfilePage() {
 
   // Fetch user profile
   const fetchProfile = () => {
-    fetch(`${API}/users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
+    fetch(`${API}/api/users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json())
       .then(d => {
         // Normalize interests from various possible field names
@@ -209,7 +209,7 @@ function ProfilePage() {
 
   useEffect(() => {
     const fetchJoinedTrips = () => {
-      fetch(`${API}trips/`, { headers: { Authorization: `Bearer ${token()}` } })
+      fetch(`${API}/api/trips/`, { headers: { Authorization: `Bearer ${token()}` } })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(d => {
           const myTrips = (d.results || d || []).filter(trip => {
@@ -231,14 +231,14 @@ function ProfilePage() {
     const fetchUserPhotos = async () => {
       setPhotosLoading(true);
       try {
-        const res = await fetch(`${API}trips/`, { headers: { Authorization: `Bearer ${token()}` } });
+        const res = await fetch(`${API}/api/trips/`, { headers: { Authorization: `Bearer ${token()}` } });
         const trips = await res.json();
         const tripsList = Array.isArray(trips) ? trips : trips.results || [];
         const photos = [];
         for (const trip of tripsList) {
           if (new Date(trip.end_date) < new Date()) {
             try {
-              const photoRes = await fetch(`${API}/api//trips/${trip.id}/photos/`, { headers: { Authorization: `Bearer ${token()}` } });
+              const photoRes = await fetch(`${API}/api/trips/${trip.id}/photos/`, { headers: { Authorization: `Bearer ${token()}` } });
               if (photoRes.ok) {
                 const photoData = await photoRes.json();
                 const tripPhotos = Array.isArray(photoData) ? photoData : photoData.results || [];
@@ -693,7 +693,7 @@ function ProfilePage() {
               
               // Force full refresh to guarantee DB sync
               setTimeout(() => {
-                fetch(`${API}users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
+                fetch(`${API}/api/users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
                   .then(r => r.json())
                   .then(d => {
                     // Normalize interests
