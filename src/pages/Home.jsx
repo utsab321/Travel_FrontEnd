@@ -47,7 +47,7 @@ export default function Home() {
 
   useEffect(() => {
     api
-      .get("trips/destinations/")
+      .get("/api/trips/destinations/")
       .then((res) => setDestinations(res.data))
       .catch((err) => console.error("Destinations fetch failed:", err));
   }, []);

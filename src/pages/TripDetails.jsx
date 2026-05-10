@@ -203,7 +203,8 @@ export default function TripDetail() {
   const fetchMessages = useCallback(async () => {
     try {
       setChatLoading(true);
-      const res = await fetch(`http://127.0.0.1:8000/api/chat/messages/group_messages/?trip_id=${id}`, {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const res = await fetch(`${backendUrl}/api/chat/messages/group_messages/?trip_id=${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
       });
       if (res.ok) {
@@ -221,7 +222,8 @@ export default function TripDetail() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const meRes = await fetch("http://127.0.0.1:8000/api/users/me/", {
+        const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+        const meRes = await fetch("${backendUrl}/api/users/me/", {
           headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
         });
         const userProfile = await meRes.json();
@@ -231,7 +233,7 @@ export default function TripDetail() {
         setTrip(res.data);
 
         try {
-          const reviewsRes = await API.get(`trips/${id}/reviews/`);
+          const reviewsRes = await API.get(`/api/trips/${id}/reviews/`);
           const reviewsList = Array.isArray(reviewsRes.data) ? reviewsRes.data : reviewsRes.data.results || [];
           setReviews(reviewsList);
           
@@ -266,7 +268,8 @@ export default function TripDetail() {
     if (!messageInput.trim() || sendingMessage) return;
     setSendingMessage(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/chat/messages/", {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const res = await fetch("${backendUrl}/api/chat/messages/", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -290,7 +293,7 @@ export default function TripDetail() {
     if (!window.confirm(TEXTS.deleteConfirm)) return;
     setDeleting(true);
     try {
-      await API.delete(`trips/trips/${id}/`);
+      await API.delete(`/api/trips/${id}/`);
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || TEXTS.deleteError);
@@ -301,7 +304,7 @@ export default function TripDetail() {
   const handleJoinTrip = async () => {
     setTripActionLoading(true);
     try {
-      const response = await API.post(`trips/${id}/join/`);
+      const response = await API.post(`/api/trips/${id}/join/`);
       setTrip(response.data.trip || response.data);
       alert(response.data.message || "Joined trip successfully");
     } catch (err) {
@@ -315,7 +318,7 @@ export default function TripDetail() {
     if (!window.confirm("Leave this trip?")) return;
     setTripActionLoading(true);
     try {
-      const response = await API.post(`trips/${id}/leave/`);
+      const response = await API.post(`/api/trips/${id}/leave/`);
       setTrip(response.data.trip || response.data);
       alert(response.data.message || "Left trip successfully");
     } catch (err) {
@@ -329,7 +332,8 @@ export default function TripDetail() {
     if (!isTripCompleted || !isParticipant || !reviewText.trim()) return;
     setSubmittingReview(true);
     try {
-      const response = await API.post(`http://127.0.0.1:8000/api/trips/${id}/reviews/`, {
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await API.post(`${backendUrl}/api/trips/${id}/reviews/`, {
         rating: reviewRating, 
         text: reviewText.trim()
       });
@@ -363,7 +367,8 @@ export default function TripDetail() {
   const handleDeleteReview = async () => {
     if (!userReview || !window.confirm("Delete your review?")) return;
     try {
-      await API.delete(`http://127.0.0.1:8000/api/trips/${id}/reviews/${userReview.id}/`);
+      const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      await API.delete(`${backendUrl}/api/trips/${id}/reviews/${userReview.id}/`);
       setReviews(reviews.filter(r => r.id !== userReview.id));
       setUserReview(null);
       setReviewText("");
@@ -382,7 +387,7 @@ export default function TripDetail() {
   const handleSaveDescription = async () => {
     setSavingDescription(true);
     try {
-      const response = await API.patch(`trips/${id}/`, {
+      const response = await API.patch(`/api/trips/${id}/`, {
         action: 'update_description',
         description: newDescription.trim()
       });
@@ -427,7 +432,7 @@ export default function TripDetail() {
       // Delete removed expenses
       for (const expense of trip.expense_budgets) {
         if (!newIds.has(expense.id)) {
-          await API.delete(`trips/expenses/${expense.id}/`);
+          await API.delete(`/api/trips/expenses/${expense.id}/`);
         }
       }
 
@@ -435,13 +440,13 @@ export default function TripDetail() {
       for (const expense of newExpenses) {
         if (expense.id && existingIds.has(expense.id)) {
           // Update existing
-          await API.patch(`trips/expenses/${expense.id}/`, {
+          await API.patch(`/api/trips/expenses/${expense.id}/`, {
             category: expense.category,
             amount: parseFloat(expense.amount)
           });
         } else if (!expense.id) {
           // Create new
-          await API.post(`trips/${id}/expenses/`, {
+          await API.post(`/api/trips/${id}/expenses/`, {
             category: expense.category,
             amount: parseFloat(expense.amount)
           });

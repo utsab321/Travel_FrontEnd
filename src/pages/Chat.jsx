@@ -655,7 +655,7 @@ export default function Chat() {
           type === "direct" ? "direct_messages" : "group_messages";
         const paramName = type === "direct" ? "recipient_id" : "trip_id";
 
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
         const res = await fetch(
           `${backendUrl}/api/chat/messages/${actionName}/?${paramName}=${recipientId}`,
           { headers: { Authorization: `Bearer ${token}` } }

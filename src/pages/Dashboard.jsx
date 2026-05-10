@@ -1380,7 +1380,7 @@ export default function Dashboard() {
   const handleLeaveTrip = async (tripId) => {
     if (!window.confirm("Are you sure you want to leave this trip?")) return;
     try {
-      const res = await api.post(`trips/${tripId}/leave/`);
+      const res = await api.post(`/api/trips/${tripId}/leave/`);
       console.log("Leave response:", res.data);
 
       // Send system message to trip chat
@@ -1442,7 +1442,7 @@ export default function Dashboard() {
   const handleRespondToInvitation = async (invitationId, action) => {
     try {
       const res = await api.patch(
-        `trips/invitations/${invitationId}/respond/`,
+        `/api/trips/invitations/${invitationId}/respond/`,
         { action }
       );
       console.log(`${action} invitation response:`, res.data);

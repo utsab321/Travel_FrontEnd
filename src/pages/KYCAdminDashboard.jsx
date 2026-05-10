@@ -81,7 +81,7 @@ export default function KYCAdminDashboard() {
     setLoading(true);
     try {
       const API = getApi();
-      const response = await fetch(`${API}users/kyc/pending/`, {
+      const response = await fetch(`${API}/api/users/kyc/pending/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
@@ -101,7 +101,7 @@ export default function KYCAdminDashboard() {
     setSubmitting(true);
     try {
       const API = getApi();
-      const response = await fetch(`${API}users/kyc/${profileId}/action/`, {
+      const response = await fetch(`${API}/api/users/kyc/${profileId}/action/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -135,7 +135,7 @@ export default function KYCAdminDashboard() {
     setSubmitting(true);
     try {
       const API = getApi();
-      const response = await fetch(`${API}users/kyc/${profileId}/action/`, {
+      const response = await fetch(`${API}/api/users/kyc/${profileId}/action/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,

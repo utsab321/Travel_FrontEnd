@@ -229,7 +229,7 @@ export default function ChatbotWidget() {
       if (!token || !isAuthReady) return;
       
       try {
-        const data = await apiFetch("users/me/");
+        const data = await apiFetch("/api/users/me/");
         if (data) {
           setUserProfile(data);
         }
@@ -328,7 +328,7 @@ export default function ChatbotWidget() {
           response = `I can help you get there! **${routeName}** is exactly what you're looking for.\n\n[Go to ${routeName} →](${navRoute.route.path})`;
         } else {
           // Fall back to API
-          const res = await api.post("chat/chat/", { message: input });
+          const res = await api.post("/api/chat/chat/", { message: input });
           response = res.data.response || "I didn't understand that. Can you rephrase? Or ask about signup, trips, partners, chat, profile, KYC, or safety!";
           
           // Enhance API response with navigation links if it mentions key features

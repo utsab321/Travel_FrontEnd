@@ -3,7 +3,7 @@ import api from "./api";
 export const kycApi = {
   // 📤 Submit KYC
   submitKYC: (formData) => {
-    return api.post("kyc/", formData, {
+    return api.post("/api/kyc/", formData, {
       headers: {
         "Content-Type": "multipart/form-data", // important if uploading files
       },

@@ -76,7 +76,7 @@ export default function UserSearchBar() {
     try {
       setLoading(true);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`${BACKEND_URL}users/search/?q=${q}`, {
+      const response = await fetch(`${BACKEND_URL}/api/users/search/?q=${q}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -95,7 +95,7 @@ export default function UserSearchBar() {
         for (const user of users) {
           try {
             const simResponse = await fetch(
-              `${BACKEND_URL}users/similarity/${user.id}/`,
+              `${BACKEND_URL}/api/users/similarity/${user.id}/`,
               {
                 headers: {
                   'Authorization': `Bearer ${token}`,

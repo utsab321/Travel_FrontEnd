@@ -155,11 +155,11 @@ export default function DestinationDetail() {
       try {
         setLoading(true);
         // Fetch destination details
-        const destRes = await api.get(`/trips/destinations/${id}/`);
+        const destRes = await api.get(`/api/trips/destinations/${id}/`);
         setDestination(destRes.data);
 
         // Fetch trips to this destination
-        const tripsRes = await api.get(`/trips/`);
+        const tripsRes = await api.get(`/api/trips/`);
         // Filter trips by city name matching destination's city
         const filtered = tripsRes.data.results?.filter(trip => 
           trip.destination?.id === destRes.data.city?.id

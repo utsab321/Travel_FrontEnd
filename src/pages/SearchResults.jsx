@@ -204,7 +204,7 @@ export default function SearchResults() {
         const similarityScores = {};
         for (const user of data.results) {
           try {
-            const simData = await apiFetch(`users/similarity/${user.id}/`);
+            const simData = await apiFetch(`/api/users/similarity/${user.id}/`);
             similarityScores[user.id] = Math.round(simData.similarity || 0);
           } catch (err) {
             console.error("Error fetching similarity for user", user.id, ":", err);

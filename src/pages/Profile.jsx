@@ -188,6 +188,7 @@ function ProfilePage() {
       })
       .catch(err => {
         console.error("Failed to fetch profile:", err);
+        setError(err.message || "Failed to fetch profile");
         setLoading(false);
       });
   };
@@ -238,7 +239,7 @@ function ProfilePage() {
         for (const trip of tripsList) {
           if (new Date(trip.end_date) < new Date()) {
             try {
-              const photoRes = await fetch(`${API}trips/${trip.id}/photos/`, { headers: { Authorization: `Bearer ${token()}` } });
+              const photoRes = await fetch(`${API}/api//trips/${trip.id}/photos/`, { headers: { Authorization: `Bearer ${token()}` } });
               if (photoRes.ok) {
                 const photoData = await photoRes.json();
                 const tripPhotos = Array.isArray(photoData) ? photoData : photoData.results || [];

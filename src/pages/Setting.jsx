@@ -185,7 +185,7 @@ export default function SettingPage() {
         let darkModeToUse = true; // Default to dark if nothing saved
         
         try {
-          const data = await apiFetch("users/me/");
+          const data = await apiFetch("/api/users/me/");
           setProfileData(data);
           setProfileForm({
             firstName: data.first_name || "",
@@ -204,7 +204,7 @@ export default function SettingPage() {
           }
 
           // Load preferences from backend
-          const prefsData = await apiFetch("users/me/preferences/");
+          const prefsData = await apiFetch("/api/users/me/preferences/");
           darkModeToUse = prefsData.darkMode ?? true;
           
           // If localStorage has a saved theme, use it instead (localStorage takes precedence)
@@ -245,11 +245,11 @@ export default function SettingPage() {
   useEffect(() => {
     const loadSecurityQuestions = async () => {
       try {
-        const questions = await apiFetch("users/security-questions/");
+        const questions = await apiFetch("/api/users/security-questions/");
         setAllSecurityQuestions(questions || []);
         
         // Load user's current security answers
-        const userData = await apiFetch("users/me/");
+        const userData = await apiFetch("/api/users/me/");
         if (userData.security_questions && Array.isArray(userData.security_questions)) {
           // security_questions is a list of IDs that are already saved
           const savedIds = userData.security_questions.map(id => String(id));
@@ -275,7 +275,7 @@ export default function SettingPage() {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${getBaseUrl()}api/users/me/`, {
+      const res = await fetch(`${getBaseUrl()}/api/users/me/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({
@@ -295,7 +295,7 @@ export default function SettingPage() {
     if (pwForm.newPassword !== pwForm.confirmPassword) return showToast("error", "Passwords do not match");
     if (pwForm.newPassword.length < 8) return showToast("error", "Password must be at least 8 characters");
     try {
-      const res = await fetch(`${getBaseUrl()}api/users/me/change-password/`, {
+      const res = await fetch(`${getBaseUrl()}/api/users/me/change-password/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ current_password: pwForm.currentPassword, new_password: pwForm.newPassword }),
@@ -335,7 +335,7 @@ export default function SettingPage() {
         darkMode: updated.darkMode,
       };
       
-      const res = await fetch(`${getBaseUrl()}api/users/me/preferences/`, {
+      const res = await fetch(`${getBaseUrl()}/api/users/me/preferences/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify(backendPrefs),
@@ -401,7 +401,7 @@ export default function SettingPage() {
 
     setSavingSecurityQuestions(true);
     try {
-      const res = await fetch(`${getBaseUrl()}api/users/me/security-questions/`, {
+      const res = await fetch(`${getBaseUrl()}/api/users/me/security-questions/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ security_questions: newAnswers }),
@@ -450,7 +450,7 @@ export default function SettingPage() {
     setDeleteModal(prev => ({ ...prev, loading: true, error: "" }));
 
     try {
-      const res = await fetch(`${getBaseUrl()}api/users/me/delete/`, {
+      const res = await fetch(`${getBaseUrl()}/api/users/me/delete/`, {
         method: "DELETE",
         headers: { 
           "Content-Type": "application/json",
