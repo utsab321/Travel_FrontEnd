@@ -221,7 +221,7 @@ export default function EditModal({ profile, onClose, onSaved }) {
         fd.append("profile_photo", photoFile);
       }
       
-      const apiUrl = `${API}/users/profile/update/`;
+      const apiUrl = `${API}/api//users/profile/update/`;
       
       const res = await fetch(apiUrl, {
         method: "PATCH",
