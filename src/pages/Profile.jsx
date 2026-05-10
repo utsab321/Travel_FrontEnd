@@ -29,7 +29,7 @@ import EditModal from "../components/EditModal";
 const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 const getApiUrl = () => {
   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
-  return backendUrl.replace('/api/', '');
+  return backendUrl;
 };
 const token = () => localStorage.getItem("access_token");
 const avatar = (url) =>

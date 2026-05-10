@@ -48,8 +48,8 @@ const TEXTS = {
 const inp = "w-full rounded-lg bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/25 outline-none focus:border-[#1976D2] focus:ring-2 focus:ring-[#1976D2]/20 transition";
 
 const getApiUrl = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-  return backendUrl.replace('/api/', '');
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+  return backendUrl
 };
 const token = () => localStorage.getItem("access_token");
 
@@ -85,7 +85,7 @@ export default function CreateTrip() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const citiesRes = await API.get("trips/cities/");
+        const citiesRes = await API.get("/api/trips/cities/");
         setCities(citiesRes.data || []);
 
         const tagsRes = await fetch(`${getApiUrl()}/api/users/constraint-tags/`, {

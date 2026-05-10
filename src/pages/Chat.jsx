@@ -506,15 +506,15 @@ export default function Chat() {
         setChatLoading(true);
         setChatError(null);
 
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
         const [meRes, friendsRes, tripsRes] = await Promise.all([
-          fetch(`${backendUrl}users/me/`, {
+          fetch(`${backendUrl}/api/users/me/`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${backendUrl}users/friends/`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${backendUrl.replace('/api/', '')}/api/trips/`, {
+          fetch(`${backendUrl}/api/trips/`, {
             headers: { Authorization: `Bearer ${token}` },
           }).catch(() => ({ ok: false })),
         ]);
@@ -543,7 +543,7 @@ export default function Chat() {
             ? friendsData
             : friendsData.friends || friendsData.results || [];
           
-          const baseUrl = backendUrl.replace('/api/', '');
+          const baseUrl = backendUrl;
           
           convos = friends.map(friend => {
             // Get profile picture - API returns relative path, need to make it absolute
@@ -657,7 +657,7 @@ export default function Chat() {
 
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
         const res = await fetch(
-          `${backendUrl.replace('/api/', '')}/api/chat/messages/${actionName}/?${paramName}=${recipientId}`,
+          `${backendUrl}/api/chat/messages/${actionName}/?${paramName}=${recipientId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -709,9 +709,9 @@ export default function Chat() {
       const recipientId =
         selectedConversation.userId || selectedConversation.tripId;
       const type = selectedConversation.type;
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 
-      const res = await fetch(`${backendUrl.replace('/api/', '')}/api/chat/messages/`, {
+      const res = await fetch(`${backendUrl}/api/chat/messages/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

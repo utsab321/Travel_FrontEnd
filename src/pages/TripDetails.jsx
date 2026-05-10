@@ -119,7 +119,7 @@ const fmtTime = (d) => new Date(d).toLocaleTimeString([], { hour: "2-digit", min
 
 function Avatar({ name = "?", size = 36, style = {}, src = null }) {
   const initials = name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-  const baseUrl = (process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/").replace('/api/', '');
+  const baseUrl = (process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000");
   const imageUrl = src && (src.startsWith("http") ? src : `${baseUrl}${src}`);
   
   return (

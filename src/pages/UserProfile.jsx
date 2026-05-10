@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { ProfileHeaderSkeleton, ProfileFriendsListSkeleton, PhotoGallerySkeleton } from "../components/SkeletonLoaders";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL =  process.env.REACT_APP_BACKEND_URL ||"http://127.0.0.1:8000";
 const FONTS = {
   display: "Playfair Display, Georgia, serif",
   body: "DM Sans, system-ui, sans-serif",
@@ -171,7 +171,7 @@ export default function UserProfile() {
   const fetchUserKycStatus = useCallback(async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/me/`, {
+      const response = await fetch(`${API_URL}/api/users/me/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -192,7 +192,7 @@ export default function UserProfile() {
       const token = localStorage.getItem('access_token');
       
       // Fetch profile directly by username so private users are not mistaken for missing users.
-      const profileResponse = await fetch(`http://127.0.0.1:8000/api/users/user-profile/by-username/${username}/`, {
+      const profileResponse = await fetch(`${API_URL}/api/users/user-profile/by-username/${username}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -210,7 +210,7 @@ export default function UserProfile() {
         setUserData(errorData);
         
         // Still fetch friend status
-        const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${errorData.id}/`, {
+        const statusResponse = await fetch(`${API_URL}/api/users/friend-request/status/${errorData.id}/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -227,7 +227,7 @@ export default function UserProfile() {
       setUserData(profileData);
 
       // Get similarity score
-      const similarityResponse = await fetch(`http://127.0.0.1:8000/api/users/similarity/${profileData.id}/`, {
+      const similarityResponse = await fetch(`${API_URL}/api/users/similarity/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -240,7 +240,7 @@ export default function UserProfile() {
       }
 
       // Get friend request status
-      const statusResponse = await fetch(`http://127.0.0.1:8000/api/users/friend-request/status/${profileData.id}/`, {
+      const statusResponse = await fetch(`${API_URL}/api/users/friend-request/status/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -251,7 +251,7 @@ export default function UserProfile() {
       }
 
       // Fetch user's friends
-      const friendsResponse = await fetch(`http://127.0.0.1:8000/api/users/friends/${profileData.id}/`, {
+      const friendsResponse = await fetch(`${API_URL}/api/users/friends/${profileData.id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -279,7 +279,7 @@ export default function UserProfile() {
       setPhotosLoading(true);
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`http://127.0.0.1:8000/api/trips/user/${userData.id}/`, {
+        const res = await fetch(`${API_URL}/api/trips/user/${userData.id}/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const trips = await res.json();
@@ -288,7 +288,7 @@ export default function UserProfile() {
         const photos = [];
         for (const trip of tripsList) {
           try {
-            const photoRes = await fetch(`http://127.0.0.1:8000/api/trips/${trip.id}/photos/`, {
+            const photoRes = await fetch(`${API_URL}/api/trips/${trip.id}/photos/`, {
               headers: { 'Authorization': `Bearer ${token}` }
             });
             if (photoRes.ok) {
@@ -321,7 +321,7 @@ export default function UserProfile() {
       setActionLoading(true);
       setCooldownMessage(null);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/friend-request/send/${userData.id}/`, {
+      const response = await fetch(`${API_URL}/api/users/friend-request/send/${userData.id}/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -362,7 +362,7 @@ export default function UserProfile() {
     try {
       setActionLoading(true);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/friend-request/${friendStatus.request_id}/respond/`, {
+      const response = await fetch(`${API_URL}/api/users/friend-request/${friendStatus.request_id}/respond/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -388,7 +388,7 @@ export default function UserProfile() {
     try {
       setActionLoading(true);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/friend-request/${friendStatus.request_id}/cancel/`, {
+      const response = await fetch(`${API_URL}/api/users/friend-request/${friendStatus.request_id}/cancel/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -413,7 +413,7 @@ export default function UserProfile() {
     try {
       setActionLoading(true);
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`http://127.0.0.1:8000/api/users/unfriend/${userData.id}/`, {
+      const response = await fetch(`${API_URL}/api/users/unfriend/${userData.id}/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

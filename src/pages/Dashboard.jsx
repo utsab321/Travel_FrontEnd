@@ -1347,9 +1347,9 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem("access_token");
         const backendUrl =
-          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
         const userName = user?.user?.first_name || user?.user?.username || "A user";
-        await fetch(`${backendUrl.replace("/api/", "")}/api/chat/messages/`, {
+        await fetch(`${backendUrl}/api/chat/messages/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1387,9 +1387,9 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem("access_token");
         const backendUrl =
-          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+          process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
         const userName = user?.user?.first_name || user?.user?.username || "A user";
-        await fetch(`${backendUrl.replace("/api/", "")}/api/chat/messages/`, {
+        await fetch(`${backendUrl}/api/chat/messages/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1425,7 +1425,7 @@ export default function Dashboard() {
       return;
     try {
       console.log("Deleting trip:", tripId);
-      await api.delete(`trips/${tripId}/`);
+      await api.delete(`/api/trips/${tripId}/`);
       console.log("Trip deleted successfully");
 
       // Invalidate caches to refetch updated data
@@ -2465,14 +2465,14 @@ function CreateTripSection({ onTripCreated, setActiveTab }) {
   const [newExpense, setNewExpense] = useState({ category: "", amount: "" });
 
   const getApiUrl = () => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-    return backendUrl.replace('/api/', '');
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+    return backendUrl;
   };
   
   const token = () => localStorage.getItem("access_token");
 
   useEffect(() => {
-    api.get("trips/cities/").then(r => setCities(r.data || [])).catch(console.error);
+    api.get("/api/trips/cities/").then(r => setCities(r.data || [])).catch(console.error);
   }, []);
 
   const handleChange = (e) => {

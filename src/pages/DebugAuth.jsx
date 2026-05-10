@@ -133,7 +133,10 @@ export default function DebugAuth() {
                   alert("No token found");
                   return;
                 }
-                const res = await fetch("http://127.0.0.1:8000/api/users/me/", {
+                const backendUrl =
+                  process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+
+                const res = await fetch(`{backendUrl}/api/users/me/`, {
                   headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await res.json();

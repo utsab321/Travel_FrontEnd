@@ -59,8 +59,8 @@ const TEXTS = {
 const TABLE_HEADERS = ["Username", "Email", "Name", "Status", "Joined", "Action"];
 
 const getApiBase = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-  return backendUrl.replace('/api/', '/users');
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+  return backendUrl.replace('/api//users');
 };
 
 export default function AdminDashboard() {

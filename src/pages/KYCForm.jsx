@@ -96,8 +96,8 @@ export default function KYCForm() {
 
   const fetchKYCStatus = async () => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-      const response = await fetch(`${backendUrl}users/kyc/`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/users/kyc/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -199,8 +199,8 @@ export default function KYCForm() {
       formData.append("passport_expiry", form.passportExpiry);
       if (passportFile) formData.append("passport_photo", passportFile);
 
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
-      const response = await fetch(`${backendUrl}users/kyc/`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      const response = await fetch(`${backendUrl}/api/users/kyc/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,

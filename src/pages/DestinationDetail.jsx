@@ -340,7 +340,7 @@ export default function DestinationDetail() {
                 style={STYLES.emptyButton}
               >
                 {BUTTONS.beFirst}
-                >
+                
                 {BUTTONS.beFirst}
               </button>
             </div>
