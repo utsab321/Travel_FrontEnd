@@ -188,7 +188,6 @@ function ProfilePage() {
       })
       .catch(err => {
         console.error("Failed to fetch profile:", err);
-        setError(err.message || "Failed to fetch profile");
         setLoading(false);
       });
   };
