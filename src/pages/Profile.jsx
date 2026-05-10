@@ -26,9 +26,9 @@ import SuggestPeople from "../components/SuggestPeople";
 import EditModal from "../components/EditModal";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
-const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 const getApiUrl = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000/api/";
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
   return backendUrl.replace('/api/', '');
 };
 const token = () => localStorage.getItem("access_token");
@@ -177,7 +177,7 @@ function ProfilePage() {
 
   // Fetch user profile
   const fetchProfile = () => {
-    fetch(`${API}users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
+    fetch(`${API}/users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
       .then(r => r.json())
       .then(d => {
         // Normalize interests from various possible field names
