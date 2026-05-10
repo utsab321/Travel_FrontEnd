@@ -198,7 +198,7 @@ function ProfilePage() {
 
   useEffect(() => {
     const fetchFriends = () => {
-      fetch(`${API}/users/friends/`, { headers: { Authorization: `Bearer ${token()}` } })
+      fetch(`${API}/api/users/friends/`, { headers: { Authorization: `Bearer ${token()}` } })
         .then(r => r.json()).then(d => setFriends(d.friends || []))
         .catch(() => setFriends([]));
     };
