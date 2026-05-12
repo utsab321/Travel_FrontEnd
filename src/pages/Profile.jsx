@@ -27,13 +27,13 @@ import EditModal from "../components/EditModal";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
-const getApiUrl = () => {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
-  return backendUrl;
-};
+// const getApiUrl = () => {
+//   const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+//   return backendUrl;
+// };
 const token = () => localStorage.getItem("access_token");
 const avatar = (url) =>
-  url ? (url.startsWith("http") ? url : `${getApiUrl()}${url}`) : null;
+  url ? (url.startsWith("http") ? url : `${API}${url}`) : null;
 
 const FONTS = {
   display: "Playfair Display, Georgia, serif",
