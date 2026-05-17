@@ -19,4 +19,30 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor for token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const refresh = localStorage.getItem("refresh_token");
+        if (refresh) {
+          const res = await axios.post(`${BACKEND_URL}/api/token/refresh/`, { refresh });
+          localStorage.setItem("access_token", res.data.access);
+          originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+          return api(originalRequest);
+        }
+      } catch (e) {
+        console.error("Token refresh failed:", e);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

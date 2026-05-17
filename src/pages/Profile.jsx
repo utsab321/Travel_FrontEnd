@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import SuggestPeople from "../components/SuggestPeople";
 import EditModal from "../components/EditModal";
+import api from "../API/api";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 const API = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
@@ -177,9 +178,9 @@ function ProfilePage() {
 
   // Fetch user profile
   const fetchProfile = () => {
-    fetch(`${API}/api/users/me/`, { headers: { Authorization: `Bearer ${token()}` } })
-      .then(r => r.json())
-      .then(d => {
+    api.get("/api/users/me/")
+      .then(r => {
+        const d = r.data;
         // Normalize interests from various possible field names
         const interests = d.interests || d.tags || d.travel_tags || d.preference_tags || [];
         d.interests = Array.isArray(interests) ? interests : [];
@@ -198,8 +199,8 @@ function ProfilePage() {
 
   useEffect(() => {
     const fetchFriends = () => {
-      fetch(`${API}/api/users/friends/`, { headers: { Authorization: `Bearer ${token()}` } })
-        .then(r => r.json()).then(d => setFriends(d.friends || []))
+      api.get("/api/users/friends/")
+        .then(r => setFriends(r.data.friends || []))
         .catch(() => setFriends([]));
     };
     fetchFriends();
@@ -209,9 +210,9 @@ function ProfilePage() {
 
   useEffect(() => {
     const fetchJoinedTrips = () => {
-      fetch(`${API}/api/trips/`, { headers: { Authorization: `Bearer ${token()}` } })
-        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-        .then(d => {
+      api.get("/api/trips/")
+        .then(r => {
+          const d = r.data;
           const myTrips = (d.results || d || []).filter(trip => {
             const isParticipant = trip.participants?.some(p => p.id === profile?.id) || trip.creator?.id === profile?.id;
             return isParticipant && trip.is_completed;
@@ -231,19 +232,17 @@ function ProfilePage() {
     const fetchUserPhotos = async () => {
       setPhotosLoading(true);
       try {
-        const res = await fetch(`${API}/api/trips/`, { headers: { Authorization: `Bearer ${token()}` } });
-        const trips = await res.json();
+        const res = await api.get("/api/trips/");
+        const trips = res.data;
         const tripsList = Array.isArray(trips) ? trips : trips.results || [];
         const photos = [];
         for (const trip of tripsList) {
           if (new Date(trip.end_date) < new Date()) {
             try {
-              const photoRes = await fetch(`${API}/api/trips/${trip.id}/photos/`, { headers: { Authorization: `Bearer ${token()}` } });
-              if (photoRes.ok) {
-                const photoData = await photoRes.json();
-                const tripPhotos = Array.isArray(photoData) ? photoData : photoData.results || [];
-                tripPhotos.forEach(photo => photos.push({ ...photo, trip }));
-              }
+              const photoRes = await api.get(`/api/trips/${trip.id}/photos/`);
+              const photoData = photoRes.data;
+              const tripPhotos = Array.isArray(photoData) ? photoData : photoData.results || [];
+              tripPhotos.forEach(photo => photos.push({ ...photo, trip }));
             } catch (e) { console.error(`Failed to fetch photos for trip ${trip.id}:`, e); }
           }
         }
