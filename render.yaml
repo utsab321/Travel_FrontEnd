@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: travel-companion-frontend
+    env: static
+    buildCommand: npm run build
+    publishDir: build
+    envVars:
+      - key: REACT_APP_BACKEND_URL
+        value: https://travel-backend-plm3.onrender.com
+      - key: REACT_APP_SOCKET_URL
+        value: https://travel-backend-plm3.onrender.com

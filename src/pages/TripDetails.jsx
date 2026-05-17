@@ -223,7 +223,7 @@ export default function TripDetail() {
     const fetchData = async () => {
       try {
         const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
-        const meRes = await fetch("${backendUrl}/api/users/me/", {
+        const meRes = await fetch(`${backendUrl}/api/users/me/`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
         });
         const userProfile = await meRes.json();
@@ -269,7 +269,7 @@ export default function TripDetail() {
     setSendingMessage(true);
     try {
       const backendUrl=process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
-      const res = await fetch("${backendUrl}/api/chat/messages/", {
+      const res = await fetch(`${backendUrl}/api/chat/messages/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,

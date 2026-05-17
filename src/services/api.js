@@ -21,6 +21,6 @@ API.interceptors.request.use(
   }
 );
 
-export const loginUser = (data) => API.post("/api//login/", data);
+export const loginUser = (data) => API.post("/api/login/", data);
 export const getTrips = () => API.get("/api/trips/trips/");
 export default API;

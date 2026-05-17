@@ -136,7 +136,7 @@ export default function DebugAuth() {
                 const backendUrl =
                   process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
 
-                const res = await fetch(`{backendUrl}/api/users/me/`, {
+                const res = await fetch(`${backendUrl}/api/users/me/`, {
                   headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await res.json();

@@ -511,7 +511,7 @@ export default function Chat() {
           fetch(`${backendUrl}/api/users/me/`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${backendUrl}users/friends/`, {
+          fetch(`${backendUrl}/api/users/friends/`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${backendUrl}/api/trips/`, {

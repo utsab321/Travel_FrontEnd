@@ -194,7 +194,7 @@ export default function SearchResults() {
       setError(null);
       
       const data = await apiFetch(
-        `users/search/?q=${encodeURIComponent(query)}`
+        `/api/users/search/?q=${encodeURIComponent(query)}`
       );
       
       setResults(data.results || []);
