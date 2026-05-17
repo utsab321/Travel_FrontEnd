@@ -96,7 +96,7 @@ export default function ForgotPassword() {
       });
       const data = await response.json();
       if (response.ok && data.success) { setQuestions(data.questions); setAnswers({}); setStep(2); }
-      else { setError(data.message || MESSAGES.emailNotFound); }
+      else { setError(data.detail || data.message || MESSAGES.emailNotFound); }
     } catch { setError(MESSAGES.connectError); }
     finally { setLoading(false); }
   };

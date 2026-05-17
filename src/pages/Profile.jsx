@@ -219,7 +219,7 @@ function ProfilePage() {
           });
           setJoinedTrips(myTrips);
         })
-        .catch(err => { console.log("Could not fetch trips:", err.message); setJoinedTrips([]); });
+        .catch(err => { console.log("Could not fetch trips:", err.response?.data?.detail || err.message); setJoinedTrips([]); });
     };
     if (profile?.id) {
       fetchJoinedTrips();
