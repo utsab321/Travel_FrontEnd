@@ -200,13 +200,25 @@ export default function KYCForm() {
       if (passportFile) formData.append("passport_photo", passportFile);
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
+      // const response = await fetch(`${backendUrl}/api/users/kyc/`, {
+      //   method: "POST",
+      //   headers: {
+      //     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      //   },
+      //   body: formData,
+      // });
       const response = await fetch(`${backendUrl}/api/users/kyc/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: formData,
-      });
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+  },
+  body: formData,
+});
+
+const text = await response.text();
+
+console.log("Status:", response.status);
+console.log("Response:", text);
 
       const data = await response.json();
 
