@@ -98,6 +98,7 @@ export default function KYCAdminDashboard() {
   };
 
   const handleApprove = async (profileId) => {
+    console.log("Approve clicked, profileId =", profileId);
     setSubmitting(true);
     try {
       const API = getApi();
