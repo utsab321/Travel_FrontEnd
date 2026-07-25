@@ -193,32 +193,15 @@ export default function KYCForm() {
     setGlobalError("");
 
     try {
-      const formData = new FormData();
+     const formData = new FormData();
 
-formData.append("full_name", form.fullName);
-formData.append("date_of_birth", form.dateOfBirth);
 formData.append("nationality", form.citizenship);
 formData.append("id_number", form.passportNo);
 formData.append("id_expiry_date", form.passportExpiry);
 
-formData.append("address", form.address);
-formData.append("city", form.city);
-formData.append("country", form.country);
-
 if (passportFile) {
     formData.append("id_document", passportFile);
 }
-
-if (selfieFile) {
-    formData.append("selfie", selfieFile);
-}
-
-if (addressProofFile) {
-    formData.append("proof_of_address", addressProofFile);
-}
-
-formData.append("proof_of_address_type", form.proofType);
-formData.append("proof_of_address_date", form.proofDate);
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://127.0.0.1:8000";
       // const response = await fetch(`${backendUrl}/api/users/kyc/`, {
