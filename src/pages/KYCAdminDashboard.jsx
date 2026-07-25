@@ -98,7 +98,6 @@ export default function KYCAdminDashboard() {
   };
 
   const handleApprove = async (profileId) => {
-    console.log("Approve clicked, profileId =", profileId);
     setSubmitting(true);
     try {
       const API = getApi();
@@ -110,7 +109,6 @@ export default function KYCAdminDashboard() {
         },
         body: JSON.stringify({ action: "approve" }),
       });
-      console.log("Status:", response.status);
 
       const data = await response.json();
       if (response.ok && data.success) {
@@ -127,6 +125,22 @@ export default function KYCAdminDashboard() {
       setSubmitting(false);
     }
   };
+
+  //     const data = await response.json();
+  //     if (response.ok && data.success) {
+  //       setKycs((prev) => prev.filter((k) => k.id !== profileId));
+  //       setActiveKyc(null);
+  //       alert(SUCCESS_MESSAGES.approvedSuccess);
+  //     } else {
+  //       alert(ERROR_MESSAGES.approveFailed);
+  //     }
+  //   } catch (err) {
+  //     console.error(ERROR_MESSAGES.approveError, err);
+  //     alert(ERROR_MESSAGES.errorApproving);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
   const handleReject = async (profileId) => {
     if (!rejectionReason.trim()) {
