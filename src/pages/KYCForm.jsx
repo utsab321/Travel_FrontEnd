@@ -195,9 +195,9 @@ export default function KYCForm() {
     try {
       const formData = new FormData();
 
-formData.append("full_name", form.fullName);
-    formData.append("date_of_birth", form.dateOfBirth);
-formData.append("nationality", form.citizenship);
+// formData.append("full_name", form.fullName);
+    // formData.append("date_of_birth", form.dateOfBirth);
+formData.append("citizenship", form.citizenship);
 formData.append("id_number", form.passportNo);
 formData.append("id_expiry_date", form.passportExpiry);
 
@@ -220,7 +220,11 @@ const token = localStorage.getItem("access_token");
 console.log("Access Token:", token);
 
 
+console.log("Form state:", form);
 
+for (const [key, value] of formData.entries()) {
+  console.log(`${key}:`, value);
+}
       const response = await fetch(`${backendUrl}/api/users/kyc/`, {
   method: "POST",
   headers: {
