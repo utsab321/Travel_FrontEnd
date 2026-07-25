@@ -216,6 +216,11 @@ if (passportFile) {
       //   },
       //   body: formData,
       // });
+const token = localStorage.getItem("access_token");
+console.log("Access Token:", token);
+
+
+
       const response = await fetch(`${backendUrl}/api/users/kyc/`, {
   method: "POST",
   headers: {
@@ -224,8 +229,8 @@ if (passportFile) {
   body: formData,
 });
 
-const text = await response.text();
-console.log(text);
+// const text = await response.text();
+// console.log(text);
 
 
       const data = await response.json();
