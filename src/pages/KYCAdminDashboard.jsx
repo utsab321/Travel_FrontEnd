@@ -109,22 +109,38 @@ export default function KYCAdminDashboard() {
         },
         body: JSON.stringify({ action: "approve" }),
       });
+      console.log("Status:", response.status);
 
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setKycs((prev) => prev.filter((k) => k.id !== profileId));
-        setActiveKyc(null);
-        alert(SUCCESS_MESSAGES.approvedSuccess);
-      } else {
-        alert(ERROR_MESSAGES.approveFailed);
-      }
-    } catch (err) {
-      console.error(ERROR_MESSAGES.approveError, err);
-      alert(ERROR_MESSAGES.errorApproving);
-    } finally {
-      setSubmitting(false);
+    const text = await response.text();
+    console.log("Response:", text);
+
+    if (response.ok) {
+      alert("Approved!");
+    } else {
+      alert(text);
     }
-  };
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+  //     const data = await response.json();
+  //     if (response.ok && data.success) {
+  //       setKycs((prev) => prev.filter((k) => k.id !== profileId));
+  //       setActiveKyc(null);
+  //       alert(SUCCESS_MESSAGES.approvedSuccess);
+  //     } else {
+  //       alert(ERROR_MESSAGES.approveFailed);
+  //     }
+  //   } catch (err) {
+  //     console.error(ERROR_MESSAGES.approveError, err);
+  //     alert(ERROR_MESSAGES.errorApproving);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
   const handleReject = async (profileId) => {
     if (!rejectionReason.trim()) {
