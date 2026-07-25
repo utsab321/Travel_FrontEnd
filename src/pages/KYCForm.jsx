@@ -204,7 +204,12 @@ formData.append("id_expiry_date", form.passportExpiry);
 
 
 if (passportFile) {
-    formData.append("id_document", passportFile);
+    formData.append("passport_photo", passportFile);
+
+}
+
+for (const [key, value] of formData.entries()) {
+    console.log(key, value);
 }
 
 
