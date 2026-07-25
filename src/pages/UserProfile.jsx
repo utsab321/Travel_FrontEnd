@@ -192,7 +192,7 @@ export default function UserProfile() {
       const token = localStorage.getItem('access_token');
       
       // Fetch profile directly by username so private users are not mistaken for missing users.
-      const profileResponse = await fetch(`${API_URL}/api/users/user-profile/${userID}/`, {
+      const profileResponse = await fetch(`${API_URL}/api/users/user-profile/${user_id}/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
