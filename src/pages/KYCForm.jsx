@@ -198,8 +198,8 @@ export default function KYCForm() {
 // formData.append("full_name", form.fullName);
     // formData.append("date_of_birth", form.dateOfBirth);
 formData.append("citizenship", form.citizenship);
-formData.append("id_number", form.passportNo);
-formData.append("id_expiry_date", form.passportExpiry);
+formData.append("passport_no", form.passportNo);
+formData.append("passport_expiry", form.passportExpiry);
 
 
 
